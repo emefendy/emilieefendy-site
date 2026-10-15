@@ -791,7 +791,8 @@ footer { border-top: 1px solid var(--line); margin-top: 40px; padding-block: 36p
   function tick() {
     if (heroBottom - scrollY < -120) { running = false; draw(); return; }
     t += 0.009;
-    mx += (tx - mx) * 0.08; my += (ty - my) * 0.08;
+    if (Math.abs(tx - mx) > 2000 || Math.abs(ty - my) > 2000) { mx = tx; my = ty; }
+    else { mx += (tx - mx) * 0.22; my += (ty - my) * 0.22; }
     draw();
     requestAnimationFrame(tick);
   }
