@@ -1,0 +1,129 @@
+{
+  "campus": {
+    "src": "campus/campus.png",
+    "w": 440,
+    "h": 345,
+    "scale": 0.31095406360424027
+  },
+  "sprites": {
+    "student-a-front": {
+      "src": "campus/student-a-front.png",
+      "frames": 4,
+      "w": 9,
+      "h": 18,
+      "fps": 7
+    },
+    "student-a-back": {
+      "src": "campus/student-a-back.png",
+      "frames": 4,
+      "w": 8,
+      "h": 18,
+      "fps": 7
+    },
+    "student-b-front": {
+      "src": "campus/student-b-front.png",
+      "frames": 4,
+      "w": 10,
+      "h": 18,
+      "fps": 7
+    },
+    "student-b-back": {
+      "src": "campus/student-b-back.png",
+      "frames": 4,
+      "w": 9,
+      "h": 18,
+      "fps": 7
+    },
+    "professor-front": {
+      "src": "campus/professor-front.png",
+      "frames": 4,
+      "w": 10,
+      "h": 18,
+      "fps": 6
+    },
+    "professor-back": {
+      "src": "campus/professor-back.png",
+      "frames": 4,
+      "w": 9,
+      "h": 18,
+      "fps": 6
+    },
+    "jogger-front": {
+      "src": "campus/jogger-front.png",
+      "frames": 4,
+      "w": 10,
+      "h": 18,
+      "fps": 10
+    },
+    "jogger-back": {
+      "src": "campus/jogger-back.png",
+      "frames": 4,
+      "w": 10,
+      "h": 18,
+      "fps": 10
+    },
+    "cyclist-front": {
+      "src": "campus/cyclist-front.png",
+      "frames": 4,
+      "w": 13,
+      "h": 20,
+      "fps": 9
+    },
+    "cyclist-back": {
+      "src": "campus/cyclist-back.png",
+      "frames": 4,
+      "w": 12,
+      "h": 20,
+      "fps": 9
+    },
+    "dog-front": {
+      "src": "campus/dog-front.png",
+      "frames": 4,
+      "w": 9,
+      "h": 9,
+      "fps": 10
+    },
+    "dog-back": {
+      "src": "campus/dog-back.png",
+      "frames": 4,
+      "w": 9,
+      "h": 9,
+      "fps": 10
+    },
+    "squirrel": {
+      "src": "campus/squirrel.png",
+      "frames": 4,
+      "w": 8,
+      "h": 7,
+      "fps": 3
+    },
+    "bird": {
+      "src": "campus/bird.png",
+      "frames": 3,
+      "w": 10,
+      "h": 7,
+      "fps": 8
+    },
+    "leaf": {
+      "src": "campus/leaf.png",
+      "frames": 4,
+      "w": 5,
+      "h": 5,
+      "fps": 6
+    },
+    "boat": {
+      "src": "campus/boat.png",
+      "frames": 1,
+      "w": 10,
+      "h": 13,
+      "fps": 0
+    },
+    "smoke": {
+      "src": "campus/smoke.png",
+      "frames": 3,
+      "w": 11,
+      "h": 14,
+      "fps": 3
+    }
+  }
+}

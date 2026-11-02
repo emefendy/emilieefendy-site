@@ -6,7 +6,6 @@ import { reveal } from './lib/scroll';
 import { slugify } from './lib/slug';
 import { lockScroll, reducedMotion, scrollToEl, startSmoothScroll } from './lib/smoothScroll';
 import { buildCommands } from './palette/commands';
-import type { OrbitalLabel } from './orbital/OrbitalCanvas';
 import { CommandPalette } from './palette/CommandPalette';
 import { Readout } from './orbital/Readout';
 import { Nav } from './components/Nav';
@@ -101,20 +100,10 @@ export function App() {
     [openWork, openExperience],
   );
 
-  // tags pinned to the hero orbital; each jumps to its chapter
-  const labels = useMemo<OrbitalLabel[]>(() => {
-    const jump = (id: string) => () => {
-      const el = document.getElementById(id);
-      // land a little past the marker so the chapter is properly on
-      if (el) scrollToEl(el, -window.innerHeight * 0.55);
-    };
-    return [
-      { text: 'Nonprofits', at: [0, 0.78, 0], onClick: jump('ch-chw') },
-      { text: 'Agents', at: [0.62, 0.02, 0.1], onClick: jump('ch-granson') },
-      { text: 'Quantum', at: [-0.66, 0, 0], onClick: jump('ch-quera') },
-      { text: 'Evals', at: [0.1, -0.05, 0.62], onClick: jump('ch-mercor') },
-      { text: 'Physics', at: [0, -0.8, 0], onClick: jump('ch-bjc') },
-    ];
+  // the campus tags jump to their chapter, landing a little past the marker so it's properly on
+  const openChapter = useCallback((id: string) => {
+    const el = document.getElementById(id);
+    if (el) scrollToEl(el, -window.innerHeight * 0.55);
   }, []);
 
   const commands = useMemo(
@@ -126,14 +115,14 @@ export function App() {
     <>
       <Quiet>
         <Suspense fallback={null}>
-          <OrbitalCanvas theme={theme} reduced={reduced} labels={labels} />
+          <OrbitalCanvas theme={theme} reduced={reduced} />
         </Suspense>
       </Quiet>
       <Nav theme={theme} onToggleTheme={toggleTheme} onOpenPalette={() => setPaletteOpen(true)} />
       <main>
         <Intro />
         <div className="wrap">
-          <Hero />
+          <Hero onOpenChapter={openChapter} reduced={reduced} />
         </div>
         <Chapters onMore={onMore} />
         <div className="wrap">

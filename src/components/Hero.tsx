@@ -1,5 +1,6 @@
 import { EMAIL } from '../content';
 import { scrollToEl } from '../lib/smoothScroll';
+import { CampusScene } from '../campus/CampusScene';
 import { MOD_KEY } from './Nav';
 
 /** Black screen, one line, one point of light. Scrolling lets it bloom. */
@@ -21,10 +22,13 @@ export function Intro() {
   );
 }
 
-export function Hero() {
+type HeroProps = { onOpenChapter: (id: string) => void; reduced: boolean };
+
+export function Hero({ onOpenChapter, reduced }: HeroProps) {
   return (
     <header className="hero" id="top">
-      <div className="anchor" style={{ top: '30%' }} data-orbital="0" data-orbital-x="0.44" data-orbital-labels="1" data-orbital-my="0.5" data-orbital-ms="0.5" />
+      {/* the campus is the picture here, so the orbital shrinks back to its point and fades */}
+      <div className="anchor" style={{ top: '30%' }} data-orbital="0" data-orbital-s="0.035" data-orbital-y="-0.3" data-orbital-o="0" />
       <div className="hero-copy">
         <p className="hero-eyebrow">CS &amp; physics · Harvard</p>
         <h1 className="hero-h">
@@ -33,8 +37,8 @@ export function Hero() {
           Efendy.
         </h1>
         <p className="hero-p">
-          I study computer science and physics, and build software for nonprofits. That cloud is a real hydrogen orbital,
-          sampled from |ψ|². Scroll to change its state. Click anywhere to measure it.
+          I study computer science and physics, and build software for nonprofits. Each building on this campus is a chapter of
+          that work. Click a tag to walk in.
         </p>
         <div className="hero-ctas">
           <button type="button" className="btn btn-solid" onClick={() => scrollToEl(document.getElementById('chapters')!, 0)}>
@@ -48,6 +52,7 @@ export function Hero() {
           Concurrent S.M. in CS · press <kbd>{MOD_KEY === '⌘' ? '⌘K' : 'Ctrl K'}</kbd> to search
         </p>
       </div>
+      <CampusScene onOpen={onOpenChapter} reduced={reduced} />
     </header>
   );
 }
