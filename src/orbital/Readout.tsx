@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ORBITALS } from './orbitals';
-import { measureEvents, useOrbital } from './store';
+import { measureEvents, orbitalStore, useOrbital } from './store';
 
 const INTERACTIVE = 'a, button, input, textarea, select, summary, label, dialog, [role="option"], [role="dialog"], .ch-card, .w-body';
 
@@ -20,7 +20,7 @@ function OrbitalName({ name }: { name: string }) {
  * gesture, since it's the thing that explains it.
  */
 export function Readout() {
-  const { index, measured, ready } = useOrbital();
+  const { index, measured, ready, scene } = useOrbital();
   const o = ORBITALS[index] ?? ORBITALS[0]!;
   const [fresh, setFresh] = useState(false);
 
@@ -31,6 +31,8 @@ export function Readout() {
       if (t?.closest(INTERACTIVE)) return;
       // don't hijack someone selecting text
       if (getSelection()?.toString()) return;
+      // measuring only means something while the orbital is the picture
+      if (orbitalStore.get().scene !== 'orbital') return;
       measureEvents.dispatchEvent(new Event('measure'));
     };
     window.addEventListener('pointerdown', onDown);
@@ -43,6 +45,17 @@ export function Readout() {
     const id = setTimeout(() => setFresh(false), 2400);
     return () => clearTimeout(id);
   }, [measured]);
+
+  if (scene === 'campus') {
+    return (
+      <aside className="readout on" aria-label="Campus status">
+        <i className="ro-dot" aria-hidden="true" />
+        <span>
+          <span className="ro-name">This campus is live.</span> <span className="ro-hint">Click a building's tag to open its chapter.</span>
+        </span>
+      </aside>
+    );
+  }
 
   return (
     <aside className={'readout' + (ready ? ' on' : '') + (fresh ? ' fresh' : '')} aria-label="Orbital status">

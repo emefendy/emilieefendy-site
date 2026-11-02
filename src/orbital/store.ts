@@ -7,16 +7,22 @@ import { useSyncExternalStore } from 'react';
  */
 
 export type Measurement = { r: number; at: number };
-type State = { index: number; measured: Measurement | null; ready: boolean };
+type State = {
+  index: number;
+  measured: Measurement | null;
+  ready: boolean;
+  /** which picture the status pill should talk about */
+  scene: 'campus' | 'orbital';
+};
 
-let state: State = { index: 0, measured: null, ready: false };
+let state: State = { index: 0, measured: null, ready: false, scene: 'orbital' };
 const subs = new Set<() => void>();
 
 export const orbitalStore = {
   get: () => state,
   set(patch: Partial<State>) {
     const next = { ...state, ...patch };
-    if (next.index === state.index && next.measured === state.measured && next.ready === state.ready) return;
+    if ((Object.keys(next) as (keyof State)[]).every((k) => next[k] === state[k])) return;
     state = next;
     subs.forEach((f) => f());
   },
