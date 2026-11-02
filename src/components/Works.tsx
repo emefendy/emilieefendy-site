@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { WORKS } from '../content';
-import { SectionHead } from './SectionHead';
 
 type Props = { onOpen: (slug: string) => void };
 
@@ -17,8 +16,7 @@ export function Works({ onOpen }: Props) {
   };
 
   return (
-    <section id="works" data-orbital="3" data-orbital-x="0.62" data-orbital-s="1.1" data-orbital-o="0.22" aria-labelledby="h-works">
-      <SectionHead id="works" title="the works" />
+    <>
       <ol className={'wk' + (hover !== null ? ' hovering' : '')} onMouseLeave={() => setHover(null)}>
         {WORKS.map((w, i) => (
           <li key={w.slug} className={hover === i ? 'on' : undefined}>
@@ -45,7 +43,7 @@ export function Works({ onOpen }: Props) {
         ))}
       </ol>
       <Follower index={hover} />
-    </section>
+    </>
   );
 }
 

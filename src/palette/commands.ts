@@ -1,6 +1,5 @@
-import { EMAIL, EXPERIENCE, SECTIONS, SOCIALS, WORKS, type Slide } from '../content';
+import { EMAIL, EXPERIENCE, SCENES, SOCIALS, WORKS, type SceneId, type Slide } from '../content';
 import { copyText } from '../lib/clipboard';
-import { reveal } from '../lib/scroll';
 import { slugify } from '../lib/slug';
 import type { Theme } from '../hooks/useTheme';
 import type { Command } from './types';
@@ -8,10 +7,12 @@ import type { Command } from './types';
 type Deps = {
   theme: Theme;
   toggleTheme: () => void;
+  openScene: (scene: SceneId) => void;
   openWork: (slug: string) => void;
   openExperience: (org: string) => void;
   openSlides: (slides: Slide[], index: number) => void;
   toast: (msg: string) => void;
+  goHome: () => void;
 };
 
 const REPO = 'https://github.com/emefendy/emilieefendy-site';
@@ -20,13 +21,23 @@ const blurb = (w: (typeof WORKS)[number]) =>
   w.body.map((b) => (b.kind === 'p' ? b.text : b.items.join(' '))).join(' ');
 
 export function buildCommands(d: Deps): Command[] {
-  const sections: Command[] = SECTIONS.map((s) => ({
-    id: 'go:' + s.id,
-    title: `Go to the ${s.label}`,
-    hint: s.eyebrow,
-    group: 'Sections',
-    run: () => reveal(document.getElementById(s.id), { flash: false }),
-  }));
+  const sections: Command[] = [
+    ...SCENES.map((s, i) => ({
+      id: 'go:' + s.id,
+      title: `Walk into ${s.label}`,
+      hint: String(i + 1).padStart(2, '0'),
+      keywords: 'building section open',
+      group: 'Sections' as const,
+      run: () => d.openScene(s.id),
+    })),
+    {
+      id: 'go:campus',
+      title: 'Back to the campus',
+      keywords: 'home top overview',
+      group: 'Sections',
+      run: d.goHome,
+    },
+  ];
 
   const works: Command[] = WORKS.map((w) => ({
     id: 'work:' + w.slug,
