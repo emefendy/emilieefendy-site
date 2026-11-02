@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { BUILDINGS, CANOPIES, CHIMNEYS, LAMPS, LAWNS, RIVER, type Pt } from './map';
 import { facing, heading, position, step, type Walker } from './walk';
-import { orbitalStore } from '../orbital/store';
+import type { SceneId } from '../content';
 
 type SpriteInfo = { src: string; frames: number; w: number; h: number; fps: number };
 type Manifest = {
@@ -38,7 +38,34 @@ type Bird = { x: number; y: number; vx: number; phase: number; wob: number };
 type Puff = { x: number; y: number; age: number; life: number };
 type Leaf = { x: number; y: number; age: number; life: number; sway: number };
 
-type Props = { onOpen: (chapter: string) => void; reduced: boolean };
+type Props = { focus: SceneId | null; onOpen: (scene: SceneId) => void; reduced: boolean };
+
+/**
+ * Where to put the camera so a building fills the space beside the scene
+ * panel. Returns a CSS transform for the campus, which scales about the
+ * building's centre and then slides that centre into place.
+ */
+function framing(outer: DOMRect, box: readonly [number, number, number, number]) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const [x0, y0, x1, y1] = box;
+  const cx = (x0 + x1) / 2 / SRC_W;
+  const cy = (y0 + y1) / 2 / SRC_H;
+  const bw = ((x1 - x0) / SRC_W) * outer.width;
+  const bh = ((y1 - y0) / SRC_H) * outer.height;
+  const wide = vw > 900;
+  // desktop: panel on the left, building on the right; phone: building on top, panel below
+  const panel = wide ? Math.min(560, vw * 0.42) + 32 : 0;
+  const areaW = wide ? vw - panel : vw;
+  const areaH = wide ? vh : vh * 0.42;
+  const scale = Math.min((areaW * 0.86) / bw, (areaH * 0.84) / bh);
+  const tx = (wide ? panel + areaW / 2 : vw / 2) - (outer.left + cx * outer.width);
+  const ty = (wide ? vh / 2 : areaH / 2 + 8) - (outer.top + cy * outer.height);
+  return {
+    transformOrigin: `${cx * 100}% ${cy * 100}%`,
+    transform: `translate3d(${tx}px, ${ty}px, 0) scale(${scale})`,
+  };
+}
 
 /**
  * The campus: a painted background with the people, birds, smoke, leaves
@@ -46,11 +73,23 @@ type Props = { onOpen: (chapter: string) => void; reduced: boolean };
  * (440 pixels across) and CSS scales it up with hard pixel edges, so every
  * sprite lands exactly on the art's pixel grid.
  */
-export function CampusScene({ onOpen, reduced }: Props) {
+export function CampusScene({ focus, onOpen, reduced }: Props) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const box = useRef<HTMLDivElement>(null);
   const [manifest, setManifest] = useState<Manifest | null>(null);
   const [ready, setReady] = useState(false);
+  const [cam, setCam] = useState<CSSProperties>({});
+
+  // point the camera at the focused building, and keep it there through resizes
+  useLayoutEffect(() => {
+    const b = BUILDINGS.find((x) => x.scene === focus);
+    const el = box.current;
+    if (!b || !el) return setCam({});
+    const aim = () => setCam(framing(el.getBoundingClientRect(), b.box));
+    aim();
+    window.addEventListener('resize', aim);
+    return () => window.removeEventListener('resize', aim);
+  }, [focus]);
 
   useEffect(() => {
     let live = true;
@@ -60,20 +99,6 @@ export function CampusScene({ onOpen, reduced }: Props) {
       .catch(() => {});
     return () => {
       live = false;
-    };
-  }, []);
-
-  // the status pill talks about the campus while it's on screen
-  useEffect(() => {
-    const el = box.current;
-    if (!el) return;
-    const io = new IntersectionObserver(([e]) => orbitalStore.set({ scene: e?.isIntersecting ? 'campus' : 'orbital' }), {
-      threshold: 0.35,
-    });
-    io.observe(el);
-    return () => {
-      io.disconnect();
-      orbitalStore.set({ scene: 'orbital' });
     };
   }, []);
 
@@ -324,20 +349,24 @@ export function CampusScene({ onOpen, reduced }: Props) {
   }, [manifest, reduced]);
 
   return (
-    <div className={'campus' + (ready ? ' on' : '')} ref={box}>
+    <div className={'campus' + (ready ? ' on' : '') + (focus ? ' zoomed' : '')} ref={box}>
+      <div className="campus-cam" style={cam}>
       <canvas ref={canvas} className="campus-cv" role="img" aria-label="A pixel-art college campus at dusk: libraries, a workshop, an observatory and a server hall around a statue, with people walking the paths" />
       {ready &&
         BUILDINGS.map((b, i) => (
           <button
-            key={b.id}
+            key={b.scene}
             type="button"
-            className="o-label campus-tag"
-            style={{ left: `${(b.at[0] / SRC_W) * 100}%`, top: `${(b.at[1] / SRC_H) * 100}%`, '--i': i } as CSSProperties}
-            onClick={() => onOpen(b.chapter)}
+            className="campus-tag"
+            style={{ left: `${(b.tag[0] / SRC_W) * 100}%`, top: `${(b.tag[1] / SRC_H) * 100}%`, '--i': i } as CSSProperties}
+            onClick={() => onOpen(b.scene)}
+            tabIndex={focus ? -1 : 0}
           >
+            <span className="campus-tag-n">{String(i + 1).padStart(2, '0')}</span>
             {b.label}
           </button>
         ))}
+      </div>
     </div>
   );
 }

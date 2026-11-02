@@ -5,6 +5,8 @@
  * size only these numbers move.
  */
 
+import type { SceneId } from '../content';
+
 export type Pt = readonly [number, number];
 
 /** Walkable path junctions, traced off the stone paving. */
@@ -83,13 +85,16 @@ export const LAWNS: readonly Pt[] = [
   [640, 870],
 ];
 
-export type Building = { id: string; label: string; at: Pt; chapter: string };
+export type Box = readonly [number, number, number, number];
+export type Building = { scene: SceneId; label: string; tag: Pt; box: Box };
 
-/** Each building's tag and the chapter it opens. */
+/**
+ * The four buildings you can walk into: where each tag sits, and the box the
+ * camera frames when you zoom in (x0, y0, x1, y1).
+ */
 export const BUILDINGS: readonly Building[] = [
-  { id: 'library', label: 'Nonprofits', at: [400, 250], chapter: 'ch-chw' },
-  { id: 'workshop', label: 'Agents', at: [300, 520], chapter: 'ch-granson' },
-  { id: 'observatory', label: 'Quantum', at: [1130, 250], chapter: 'ch-quera' },
-  { id: 'servers', label: 'Evals', at: [1110, 560], chapter: 'ch-mercor' },
-  { id: 'statue', label: 'Physics', at: [735, 470], chapter: 'ch-bjc' },
+  { scene: 'education', label: 'Education', tag: [400, 250], box: [190, 165, 615, 525] },
+  { scene: 'experience', label: 'Experience', tag: [1110, 560], box: [880, 475, 1320, 835] },
+  { scene: 'projects', label: 'Projects', tag: [300, 520], box: [105, 455, 560, 825] },
+  { scene: 'extras', label: 'Extras', tag: [1130, 250], box: [845, 175, 1250, 525] },
 ];

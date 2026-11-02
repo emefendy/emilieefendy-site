@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { WORKS, type Media, type Slide } from '../content';
-import { lockScroll } from '../lib/smoothScroll';
 import { SplitText } from './Reveal';
 
 type Props = {
@@ -31,7 +30,6 @@ export function CaseStudy({ slug, onClose, onNavigate, onOpenSlides }: Props) {
       setLeaving(false);
       if (!d.open) {
         d.showModal();
-        lockScroll('case', true);
       }
       scroller.current?.scrollTo({ top: 0 });
       return;
@@ -40,7 +38,6 @@ export function CaseStudy({ slug, onClose, onNavigate, onOpenSlides }: Props) {
     setLeaving(true);
     const id = setTimeout(() => {
       d.close();
-      lockScroll('case', false);
       setLeaving(false);
       setShown(null);
     }, LEAVE_MS);
@@ -62,7 +59,7 @@ export function CaseStudy({ slug, onClose, onNavigate, onOpenSlides }: Props) {
       }}
     >
       {w && (
-        <div className="cs-scroll" ref={scroller} data-lenis-prevent>
+        <div className="cs-scroll" ref={scroller}>
           <header className="cs-bar">
             <span className="cs-count">
               {String(i + 1).padStart(2, '0')} / {String(WORKS.length).padStart(2, '0')}
@@ -141,7 +138,7 @@ function CaseMedia({ media, onOpenSlides }: { media: Media; onOpenSlides: Props[
   return (
     <div className={'deck deck-' + media.layout}>
       <p className="deck-label">{media.label}</p>
-      <div className="deck-strip" data-lenis-prevent>
+      <div className="deck-strip">
         {media.slides.map((s, k) => (
           <button
             key={s.full}
