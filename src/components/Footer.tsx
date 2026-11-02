@@ -26,7 +26,26 @@ export function Footer() {
   };
 
   return (
-    <footer>
+    <>
+      <section className="closing" aria-labelledby="h-closing" data-orbital="0" data-orbital-x="0" data-orbital-y="-0.15" data-orbital-s="0.75" data-orbital-o="0.55">
+        <p className="closing-eyebrow">05 · ψ(t → ∞)</p>
+        <h2 id="h-closing" className="closing-h">
+          Say hi.
+        </h2>
+        <p className="closing-p">Email is the fastest way to reach me. I read everything.</p>
+        <div className="hero-ctas closing-ctas">
+          <a className="btn btn-solid" href={'mailto:' + EMAIL}>
+            Email me
+          </a>
+          <a className="btn btn-ghost" href={SOCIALS.github} target="_blank" rel="noopener">
+            GitHub
+          </a>
+          <a className="btn btn-ghost" href={SOCIALS.linkedin} target="_blank" rel="noopener">
+            LinkedIn
+          </a>
+        </div>
+      </section>
+      <footer>
       <div className="say">
         <span>Say hi:</span>
         <span className="addr" ref={addr}>
@@ -44,6 +63,7 @@ export function Footer() {
           linkedin
         </a>
       </div>
-    </footer>
+      </footer>
+    </>
   );
 }

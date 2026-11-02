@@ -26,6 +26,11 @@ export function scrollToEl(el: Element, offset = -88) {
 // asked for the lock and only let go once nobody holds it.
 const holders = new Set<string>();
 
+export function scrollToY(y: number) {
+  if (lenis) lenis.scrollTo(y, { duration: 1.1 });
+  else window.scrollTo({ top: y, behavior: reducedMotion() ? 'auto' : 'smooth' });
+}
+
 /** Freeze the page behind a modal. */
 export function lockScroll(who: string, locked: boolean) {
   if (locked) holders.add(who);

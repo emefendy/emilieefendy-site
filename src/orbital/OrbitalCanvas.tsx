@@ -1,48 +1,38 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type MutableRefObject, type RefObject } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { poseAt, readAnchors, type Anchor } from './anchors';
 import { fragment, vertex } from './shaders';
 import { measureEvents, orbitalStore } from './store';
 import type { SampleResponse } from './sample.worker';
 import type { Theme } from '../hooks/useTheme';
 
 const FOV = 38;
-const SECTION_IDS = ['top', 'present', 'past', 'works', 'extras'] as const;
 
 const PALETTE = {
-  light: { pos: '#5548c0', neg: '#cf4f86', opacity: 0.62, blending: THREE.NormalBlending, dim: 0.26 },
-  dark: { pos: '#b3a6ff', neg: '#62d4e6', opacity: 0.85, blending: THREE.AdditiveBlending, dim: 0.34 },
+  light: { pos: '#5548c0', neg: '#cf4f86', opacity: 0.62, blending: THREE.NormalBlending },
+  dark: { pos: '#b3a6ff', neg: '#62d4e6', opacity: 0.9, blending: THREE.AdditiveBlending },
 } as const;
+
+export type OrbitalLabel = { text: string; at: readonly [number, number, number]; onClick: () => void };
 
 function particleCount() {
   const small = window.innerWidth < 700 || (navigator.hardwareConcurrency ?? 8) <= 4;
   return small ? 14000 : 34000;
 }
 
-/** Where each section starts, as a fraction of the way through the orbitals. */
-function sectionTops() {
-  return SECTION_IDS.map((id) => {
-    const el = document.getElementById(id);
-    return el ? el.getBoundingClientRect().top + window.scrollY : 0;
-  });
-}
-
-function morphFor(scrollMid: number, tops: number[]) {
-  for (let i = tops.length - 1; i >= 0; i--) {
-    if (scrollMid >= tops[i]!) {
-      const next = tops[i + 1];
-      if (next === undefined) return i;
-      // hold each shape for most of its section, then morph over the last stretch
-      const t = (scrollMid - tops[i]!) / (next - tops[i]!);
-      return i + THREE.MathUtils.smoothstep(t, 0.55, 1);
-    }
-  }
-  return 0;
-}
-
 const damp = (a: number, b: number, rate: number, dt: number) => a + (b - a) * (1 - Math.exp(-rate * dt));
 
-function Cloud({ data, theme, reduced }: { data: SampleResponse; theme: Theme; reduced: boolean }) {
+type CloudProps = {
+  data: SampleResponse;
+  theme: Theme;
+  reduced: boolean;
+  labels: readonly OrbitalLabel[];
+  labelEls: MutableRefObject<(HTMLButtonElement | null)[]>;
+  labelLayer: RefObject<HTMLDivElement>;
+};
+
+function Cloud({ data, theme, reduced, labels, labelEls, labelLayer }: CloudProps) {
   const group = useRef<THREE.Group>(null);
   const { size, camera, viewport, invalidate } = useThree();
   const pal = PALETTE[theme];
@@ -103,19 +93,21 @@ function Cloud({ data, theme, reduced }: { data: SampleResponse; theme: Theme; r
 
   // everything the frame loop reads but React doesn't need to re-render for
   const live = useRef({
-    tops: [] as number[],
+    anchors: [] as Anchor[],
+    pose: null as ReturnType<typeof poseAt> | null,
     morph: 0,
     mouse: new THREE.Vector2(9, 9),
     force: 0,
     lastMove: -1,
     collapseStart: -10,
     intro: true,
+    spin: 0.12,
     parallax: new THREE.Vector2(),
   });
 
   useEffect(() => {
     const l = live.current;
-    const measure = () => (l.tops = sectionTops());
+    const measure = () => (l.anchors = readAnchors());
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(document.body);
@@ -172,15 +164,27 @@ function Cloud({ data, theme, reduced }: { data: SampleResponse; theme: Theme; r
     };
   }, [data, geometry, material, invalidate]);
 
+  const tmp = useMemo(() => new THREE.Vector3(), []);
+
   useFrame((state, dt) => {
     const l = live.current;
     const u = material.uniforms;
     const now = performance.now();
     dt = Math.min(dt, 1 / 20);
 
-    // which orbital: driven by where the middle of the screen is
-    const target = morphFor(window.scrollY + window.innerHeight * 0.5, l.tops);
-    l.morph = reduced ? target : damp(l.morph, target, 2.6, dt);
+    // the page decides the pose; we just chase it smoothly
+    const target = poseAt(window.scrollY + window.innerHeight * 0.5, l.anchors);
+    const p = (l.pose ??= { ...target });
+    const rate = reduced ? 1000 : 3;
+    p.x = damp(p.x, target.x, rate, dt);
+    p.y = damp(p.y, target.y, rate, dt);
+    p.s = damp(p.s, target.s, rate, dt);
+    p.o = damp(p.o, target.o, rate, dt);
+    p.labels = damp(p.labels, target.labels, rate * 2, dt);
+    p.mx = damp(p.mx, target.mx, rate, dt);
+    p.my = damp(p.my, target.my, rate, dt);
+    p.ms = damp(p.ms, target.ms, rate, dt);
+    l.morph = reduced ? target.k : damp(l.morph, target.k, 2.6, dt);
     u.uMorph!.value = l.morph;
     const index = Math.round(l.morph);
     // a measurement belongs to the state it was taken in
@@ -207,26 +211,42 @@ function Cloud({ data, theme, reduced }: { data: SampleResponse; theme: Theme; r
     u.uMouse!.value.lerp(l.mouse, 1 - Math.exp(-12 * dt));
     u.uMouseForce!.value = l.force;
 
-    // big in the hero, then off to the side and faded behind the reading column
-    const heroH = l.tops[1] ?? size.height;
-    const past = THREE.MathUtils.smoothstep(window.scrollY, heroH * 0.25, heroH * 0.85);
+    // placement: anchors speak in fractions of the screen, with separate
+    // numbers for narrow screens where there's no room beside the text
     const wide = size.width / size.height > 1.15;
     const g = group.current!;
-    const xHero = wide ? viewport.width * 0.2 : 0;
-    const yHero = wide ? 0 : viewport.height * 0.02;
-    const xRest = wide ? viewport.width * 0.32 : viewport.width * 0.18;
-    g.position.x = THREE.MathUtils.lerp(xHero, xRest, past);
-    g.position.y = THREE.MathUtils.lerp(yHero, 0, past);
-    const s = (wide ? 1 : 0.62) * THREE.MathUtils.lerp(1, 1.12, past);
-    g.scale.setScalar(s);
+    g.position.x = (wide ? p.x : p.mx) * (viewport.width / 2);
+    g.position.y = (wide ? p.y : p.my) * (viewport.height / 2);
+    g.scale.setScalar(wide ? p.s : p.ms);
 
     if (!reduced) {
-      g.rotation.y += dt * 0.12;
+      // hold still while someone is aiming at a label
+      const aiming = labelLayer.current?.matches(':hover') ?? false;
+      l.spin = damp(l.spin, aiming ? 0 : 0.12, 6, dt);
+      g.rotation.y += dt * l.spin;
       g.rotation.x = damp(g.rotation.x, 0.28 - l.parallax.y * 0.18, 2, dt);
       g.rotation.z = damp(g.rotation.z, l.parallax.x * -0.08, 2, dt);
     } else g.rotation.x = 0.28;
 
-    u.uOpacity!.value = pal.opacity * THREE.MathUtils.lerp(1, pal.dim, past);
+    u.uOpacity!.value = pal.opacity * p.o;
+
+    // pin the labels to their spots on the cloud
+    const layer = labelLayer.current;
+    if (layer) {
+      layer.style.opacity = String(p.labels);
+      layer.style.visibility = p.labels < 0.02 ? 'hidden' : 'visible';
+      if (p.labels >= 0.02) {
+        g.updateMatrixWorld();
+        labels.forEach((lab, i) => {
+          const el = labelEls.current[i];
+          if (!el) return;
+          tmp.set(...lab.at).applyMatrix4(g.matrixWorld).project(camera);
+          const sx = (tmp.x * 0.5 + 0.5) * size.width;
+          const sy = (-tmp.y * 0.5 + 0.5) * size.height;
+          el.style.transform = `translate3d(${sx.toFixed(1)}px, ${sy.toFixed(1)}px, 0)`;
+        });
+      }
+    }
     u.uPixelRatio!.value = state.gl.getPixelRatio();
     u.uSize!.value = (size.width < 700 ? 13 : 11) * (camera.position.z / 4.2);
   });
@@ -238,8 +258,12 @@ function Cloud({ data, theme, reduced }: { data: SampleResponse; theme: Theme; r
   );
 }
 
-export default function OrbitalCanvas({ theme, reduced }: { theme: Theme; reduced: boolean }) {
+type Props = { theme: Theme; reduced: boolean; labels?: readonly OrbitalLabel[] };
+
+export default function OrbitalCanvas({ theme, reduced, labels = [] }: Props) {
   const [data, setData] = useState<SampleResponse | null>(null);
+  const labelEls = useRef<(HTMLButtonElement | null)[]>([]);
+  const labelLayer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const w = new Worker(new URL('./sample.worker.ts', import.meta.url), { type: 'module' });
@@ -252,17 +276,37 @@ export default function OrbitalCanvas({ theme, reduced }: { theme: Theme; reduce
   }, []);
 
   return (
-    <div className={'orbital' + (data ? ' on' : '')} aria-hidden="true">
-      {data && (
-        <Canvas
-          dpr={[1, 1.75]}
-          camera={{ fov: FOV, position: [0, 0, 4.2], near: 0.1, far: 20 }}
-          gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
-          frameloop={reduced ? 'demand' : 'always'}
-        >
-          <Cloud data={data} theme={theme} reduced={reduced} />
-        </Canvas>
+    <>
+      <div className={'orbital' + (data ? ' on' : '')} aria-hidden="true">
+        {data && (
+          <Canvas
+            dpr={[1, 1.75]}
+            camera={{ fov: FOV, position: [0, 0, 4.2], near: 0.1, far: 20 }}
+            gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
+            frameloop={reduced ? 'demand' : 'always'}
+          >
+            <Cloud data={data} theme={theme} reduced={reduced} labels={labels} labelEls={labelEls} labelLayer={labelLayer} />
+          </Canvas>
+        )}
+      </div>
+      {data && labels.length > 0 && (
+        <div className="o-labels" ref={labelLayer} style={{ visibility: 'hidden' }}>
+          {labels.map((lab, i) => (
+            <button
+              key={lab.text}
+              type="button"
+              className="o-label"
+              ref={(el) => {
+                labelEls.current[i] = el;
+              }}
+              onClick={lab.onClick}
+              style={{ '--i': i } as CSSProperties}
+            >
+              {lab.text}
+            </button>
+          ))}
+        </div>
       )}
-    </div>
+    </>
   );
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ORBITALS } from './orbitals';
 import { measureEvents, useOrbital } from './store';
 
-const INTERACTIVE = 'a, button, input, textarea, select, summary, label, dialog, [role="option"], [role="dialog"], .tl-panel, .w-body';
+const INTERACTIVE = 'a, button, input, textarea, select, summary, label, dialog, [role="option"], [role="dialog"], .ch-card, .w-body';
 
 /** "3d_z²" → 3d with a subscript z² */
 function OrbitalName({ name }: { name: string }) {
@@ -16,7 +16,7 @@ function OrbitalName({ name }: { name: string }) {
 }
 
 /**
- * The little lab readout in the corner. Also owns the click-to-measure
+ * The status pill at the bottom of the screen. Also owns the click-to-measure
  * gesture, since it's the thing that explains it.
  */
 export function Readout() {
@@ -40,29 +40,34 @@ export function Readout() {
   useEffect(() => {
     if (!measured) return;
     setFresh(true);
-    const id = setTimeout(() => setFresh(false), 2600);
+    const id = setTimeout(() => setFresh(false), 2400);
     return () => clearTimeout(id);
   }, [measured]);
 
   return (
-    <aside className={'readout' + (ready ? ' on' : '')} aria-label="Orbital readout">
-      <p className="ro-psi">
-        ψ <span className="ro-name">
-          <OrbitalName name={o.name} />
-        </span>
-      </p>
-      <p className="ro-q">
-        n={o.n} · l={o.l} · m={o.m}
-      </p>
-      <p className={'ro-m' + (fresh ? ' fresh' : '')} aria-live="polite">
+    <aside className={'readout' + (ready ? ' on' : '') + (fresh ? ' fresh' : '')} aria-label="Orbital status">
+      <i className="ro-dot" aria-hidden="true" />
+      <span aria-live="polite">
         {measured ? (
           <>
-            measured r = {measured.r.toFixed(2)} a<sub>0</sub>
+            Measured <b>r = {measured.r.toFixed(2)} a<sub>0</sub></b> in{' '}
+            <span className="ro-name">
+              <OrbitalName name={o.name} />
+            </span>
+            .
           </>
         ) : (
-          <>click anywhere to measure</>
+          <>
+            <span className="ro-name">
+              ψ <OrbitalName name={o.name} />
+            </span>{' '}
+            is live. <span className="ro-hint">Click anywhere to measure it.</span>
+          </>
         )}
-      </p>
+      </span>
+      <span className="ro-q" aria-label={`n ${o.n}, l ${o.l}, m ${o.m}`}>
+        n={o.n} l={o.l} m={o.m}
+      </span>
     </aside>
   );
 }

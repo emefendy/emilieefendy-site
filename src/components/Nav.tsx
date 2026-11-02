@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SECTIONS, type Section } from '../content';
+import { EMAIL, SECTIONS, type Section } from '../content';
 import type { Theme } from '../hooks/useTheme';
 import { MoonIcon, SearchIcon, SunIcon } from './Icons';
 
@@ -44,7 +44,8 @@ export function Nav({ theme, onToggleTheme, onOpenPalette }: Props) {
   return (
     <nav className={'top' + (scrolled ? ' scrolled' : '')} aria-label="Sections">
       <a className="logo" href="#top">
-        emilie efendy
+        <img src="img/avatar.jpg" alt="" width={28} height={28} />
+        Emilie Efendy
       </a>
       <div className="top-r">
         <ul>
@@ -68,6 +69,9 @@ export function Nav({ theme, onToggleTheme, onOpenPalette }: Props) {
         >
           {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
         </button>
+        <a className="btn btn-solid btn-sm" href={'mailto:' + EMAIL}>
+          Say hi
+        </a>
       </div>
     </nav>
   );
