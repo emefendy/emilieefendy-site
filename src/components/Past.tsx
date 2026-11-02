@@ -9,7 +9,7 @@ type Props = {
 
 export function Past({ open, onToggle }: Props) {
   return (
-    <section id="past" aria-labelledby="h-past">
+    <section id="past" data-orbital="2" data-orbital-x="0.62" data-orbital-s="1.1" data-orbital-o="0.22" aria-labelledby="h-past">
       <SectionHead id="past" title="the past" />
       <p className="sub-label">Experience</p>
       <ul className="link-list">

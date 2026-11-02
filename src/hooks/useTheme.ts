@@ -1,49 +1,31 @@
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-export type ThemeChoice = 'light' | 'dark' | 'system';
-export type Theme = Exclude<ThemeChoice, 'system'>;
+export type Theme = 'light' | 'dark';
 
 const KEY = 'theme';
-const dark = () => window.matchMedia('(prefers-color-scheme: dark)');
 
-function subscribe(onChange: () => void) {
-  const mq = dark();
-  mq.addEventListener('change', onChange);
-  return () => mq.removeEventListener('change', onChange);
-}
-
-function readSaved(): ThemeChoice {
+// Dark is the default; light is a choice you make and the site remembers.
+function readSaved(): Theme {
   try {
-    const v = localStorage.getItem(KEY);
-    return v === 'light' || v === 'dark' ? v : 'system';
+    return localStorage.getItem(KEY) === 'light' ? 'light' : 'dark';
   } catch {
-    return 'system';
+    return 'dark';
   }
 }
 
 export function useTheme() {
-  const [choice, setChoice] = useState<ThemeChoice>(readSaved);
-  const systemDark = useSyncExternalStore(subscribe, () => dark().matches, () => false);
-  const resolved: Theme = choice === 'system' ? (systemDark ? 'dark' : 'light') : choice;
+  const [theme, setTheme] = useState<Theme>(readSaved);
 
   useEffect(() => {
-    const root = document.documentElement;
-    if (choice === 'system') delete root.dataset.theme;
-    else root.dataset.theme = choice;
+    document.documentElement.dataset.theme = theme;
     try {
-      if (choice === 'system') localStorage.removeItem(KEY);
-      else localStorage.setItem(KEY, choice);
+      if (theme === 'dark') localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY, theme);
     } catch {
-      /* private mode, etc. – the theme just won't persist */
+      /* private mode: just won't persist */
     }
-  }, [choice]);
+  }, [theme]);
 
-  // Flipping to the same thing the OS already prefers drops back to "system",
-  // so the site keeps following the OS from then on.
-  const toggle = useCallback(() => {
-    const next: Theme = resolved === 'dark' ? 'light' : 'dark';
-    setChoice(next === (systemDark ? 'dark' : 'light') ? 'system' : next);
-  }, [resolved, systemDark]);
-
-  return { choice, resolved, setChoice, toggle };
+  const toggle = useCallback(() => setTheme((t) => (t === 'dark' ? 'light' : 'dark')), []);
+  return { resolved: theme, toggle };
 }

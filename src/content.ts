@@ -457,3 +457,141 @@ export const PROGRAMS = [
   'Inside DRW',
   'Two Sigma New Seekers Summit',
 ];
+
+/* ---------- chapters: the featured work, told one screen at a time ---------- */
+
+export type Stat = { label: string; value: string };
+
+export type ChapterCard =
+  | { kind: 'index'; title: string; query: string; stats: Stat[] }
+  | { kind: 'hotkey'; title: string; keys: string[]; steps: string[]; stats: Stat[] }
+  | { kind: 'pipeline'; title: string; nodes: string[]; stats: Stat[] }
+  | { kind: 'bar'; title: string; label: string; from: number; to: number; stats: Stat[] }
+  | { kind: 'count'; title: string; value: number; unit: string; langs: string[]; stats: Stat[] }
+  | { kind: 'finalist'; title: string; place: number; of: number; stats: Stat[] };
+
+export type Chapter = {
+  id: string;
+  /** short name for the chapter rail */
+  short: string;
+  org: string;
+  headline: string;
+  copy: string;
+  card: ChapterCard;
+  /** which orbital to show behind it */
+  orbital: number;
+  more: { kind: 'work'; slug: string } | { kind: 'experience'; org: string };
+};
+
+export const CHAPTERS: Chapter[] = [
+  {
+    id: 'ch-chw',
+    short: 'Search',
+    org: 'CHW Central · 501(c)(3)',
+    headline: 'Search that reads four languages.',
+    copy: 'Semantic search and a cited RAG chatbot over a nonprofit library for community health workers. I led five engineers on it and met the client every week.',
+    card: {
+      kind: 'index',
+      title: 'Index',
+      query: 'formation des agents de santé',
+      stats: [
+        { label: 'Resources indexed', value: '3,600+' },
+        { label: 'Readers', value: '60,000+' },
+        { label: 'Languages', value: 'EN · FR · ES · PT' },
+        { label: 'Re-index', value: 'on save, skip unchanged' },
+      ],
+    },
+    orbital: 1,
+    more: { kind: 'work', slug: 'chw-central' },
+  },
+  {
+    id: 'ch-granson',
+    short: 'Granson',
+    org: 'Computers 4 People · 501(c)(3)',
+    headline: 'Help that can see your screen.',
+    copy: 'A desktop assistant for people new to computers. It decides when it needs a screenshot, then points at the thing you asked about, on any layout.',
+    card: {
+      kind: 'hotkey',
+      title: 'Granson AI',
+      keys: ['⌘', '⇧', 'Space'],
+      steps: ['Capture the screen', 'Find “the Gmail icon, top right”', 'Point to it'],
+      stats: [
+        { label: 'Languages', value: 'English · Spanish' },
+        { label: 'Voice', value: 'in and out' },
+      ],
+    },
+    orbital: 2,
+    more: { kind: 'work', slug: 'computers-4-people' },
+  },
+  {
+    id: 'ch-quera',
+    short: 'Pipeline',
+    org: 'QuEra Quantum Computing',
+    headline: 'Messy testbed data, now queryable.',
+    copy: 'An end-to-end Python pipeline into Postgres, a dashboard on a Linux VM, and three agents trained against custom evals. Presented to the executives.',
+    card: {
+      kind: 'pipeline',
+      title: 'Pipeline',
+      nodes: ['Testbed', 'Python', 'Postgres', 'Dashboard'],
+      stats: [
+        { label: 'Agents', value: 'data · analysis · FDTD' },
+        { label: 'Graded by', value: 'custom evals' },
+      ],
+    },
+    orbital: 3,
+    more: { kind: 'experience', org: 'QuEra Quantum Computing' },
+  },
+  {
+    id: 'ch-mercor',
+    short: 'Evals',
+    org: 'Mercor',
+    headline: 'From 41% to 85%.',
+    copy: 'I ran trainings on eval design and trajectory analysis for 100+ domain experts. The share of their work clearing frontier-lab benchmarks more than doubled.',
+    card: {
+      kind: 'bar',
+      title: 'Benchmarks',
+      label: 'Submissions passing',
+      from: 41,
+      to: 85,
+      stats: [{ label: 'Experts', value: '100+' }],
+    },
+    orbital: 0,
+    more: { kind: 'experience', org: 'Mercor' },
+  },
+  {
+    id: 'ch-412',
+    short: 'i18n',
+    org: '412 Food Rescue · 501(c)(3)',
+    headline: 'Every string, in three languages.',
+    copy: 'I pulled every hard-coded label, button and dialog in the Food Rescue Hero app into one dictionary that loads the language you pick.',
+    card: {
+      kind: 'count',
+      title: 'Translations',
+      value: 818,
+      unit: 'keys',
+      langs: ['EN', 'ES', 'FR'],
+      stats: [{ label: 'Feature areas', value: '50+' }],
+    },
+    orbital: 4,
+    more: { kind: 'work', slug: '412-food-rescue' },
+  },
+  {
+    id: 'ch-bjc',
+    short: 'Physics',
+    org: 'Breakthrough Junior Challenge',
+    headline: 'One of five, worldwide.',
+    copy: 'A global physics finalist for a science-communication prize, through interviews, essays and a public vote, with judges including Terence Tao and Sal Khan.',
+    card: {
+      kind: 'finalist',
+      title: 'Finalists',
+      place: 1,
+      of: 5,
+      stats: [
+        { label: 'Grand prize', value: '$400K' },
+        { label: 'Public voters', value: '140K+' },
+      ],
+    },
+    orbital: 0,
+    more: { kind: 'work', slug: 'breakthrough' },
+  },
+];

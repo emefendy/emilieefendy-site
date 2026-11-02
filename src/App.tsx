@@ -1,16 +1,17 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { EXPERIENCE, WORKS, type Slide } from './content';
+import { EXPERIENCE, WORKS, type Chapter, type Slide } from './content';
 import { useTheme } from './hooks/useTheme';
 import { useHotkeys } from './hooks/useHotkeys';
 import { reveal } from './lib/scroll';
 import { slugify } from './lib/slug';
-import { lockScroll, reducedMotion, startSmoothScroll } from './lib/smoothScroll';
+import { lockScroll, reducedMotion, scrollToEl, startSmoothScroll } from './lib/smoothScroll';
 import { buildCommands } from './palette/commands';
+import type { OrbitalLabel } from './orbital/OrbitalCanvas';
 import { CommandPalette } from './palette/CommandPalette';
 import { Readout } from './orbital/Readout';
 import { Nav } from './components/Nav';
-import { Hero } from './components/Hero';
-import { Marquee } from './components/Marquee';
+import { Hero, Intro } from './components/Hero';
+import { Chapters } from './components/Chapters';
 import { Present } from './components/Present';
 import { Past } from './components/Past';
 import { Works } from './components/Works';
@@ -18,7 +19,6 @@ import { CaseStudy } from './components/CaseStudy';
 import { Extras } from './components/Extras';
 import { Footer } from './components/Footer';
 import { Lightbox, type LightboxState } from './components/Lightbox';
-import { Cursor } from './components/Cursor';
 import { Toast } from './components/Toast';
 
 // three.js is most of the bundle; the text shouldn't wait on it
@@ -95,6 +95,28 @@ export function App() {
     '/': () => !modalOpen && setPaletteOpen(true),
   });
 
+  // "Read more" from a chapter: projects open as case studies, roles open in the past section
+  const onMore = useCallback(
+    (more: Chapter['more']) => (more.kind === 'work' ? openWork(more.slug) : openExperience(more.org)),
+    [openWork, openExperience],
+  );
+
+  // tags pinned to the hero orbital; each jumps to its chapter
+  const labels = useMemo<OrbitalLabel[]>(() => {
+    const jump = (id: string) => () => {
+      const el = document.getElementById(id);
+      // land a little past the marker so the chapter is properly on
+      if (el) scrollToEl(el, -window.innerHeight * 0.55);
+    };
+    return [
+      { text: 'Nonprofits', at: [0, 0.78, 0], onClick: jump('ch-chw') },
+      { text: 'Agents', at: [0.62, 0.02, 0.1], onClick: jump('ch-granson') },
+      { text: 'Quantum', at: [-0.66, 0, 0], onClick: jump('ch-quera') },
+      { text: 'Evals', at: [0.1, -0.05, 0.62], onClick: jump('ch-mercor') },
+      { text: 'Physics', at: [0, -0.8, 0], onClick: jump('ch-bjc') },
+    ];
+  }, []);
+
   const commands = useMemo(
     () => buildCommands({ theme, toggleTheme, openWork, openExperience, openSlides, toast: showToast }),
     [theme, toggleTheme, openWork, openExperience, openSlides, showToast],
@@ -104,15 +126,16 @@ export function App() {
     <>
       <Quiet>
         <Suspense fallback={null}>
-          <OrbitalCanvas theme={theme} reduced={reduced} />
+          <OrbitalCanvas theme={theme} reduced={reduced} labels={labels} />
         </Suspense>
       </Quiet>
       <Nav theme={theme} onToggleTheme={toggleTheme} onOpenPalette={() => setPaletteOpen(true)} />
       <main>
+        <Intro />
         <div className="wrap">
           <Hero />
         </div>
-        <Marquee />
+        <Chapters onMore={onMore} />
         <div className="wrap">
           <Present />
           <Past open={openXp} onToggle={toggleXp} />
@@ -126,7 +149,6 @@ export function App() {
       <Lightbox state={slides} onChange={setSlides} />
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} />
       {toast && <Toast key={toast.id} message={toast.msg} onDone={() => setToast(null)} />}
-      <Cursor />
     </>
   );
 }

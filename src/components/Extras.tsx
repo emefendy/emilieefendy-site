@@ -3,7 +3,7 @@ import { SectionHead } from './SectionHead';
 
 export function Extras() {
   return (
-    <section id="extras" aria-labelledby="h-extras">
+    <section id="extras" data-orbital="4" data-orbital-x="0.55" data-orbital-s="1" data-orbital-o="0.35" aria-labelledby="h-extras">
       <SectionHead id="extras" title="the extras" />
       <div className="extras">
         <div>

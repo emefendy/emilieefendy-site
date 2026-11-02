@@ -3,7 +3,7 @@ import { SectionHead } from './SectionHead';
 
 export function Present() {
   return (
-    <section id="present" aria-labelledby="h-present">
+    <section id="present" data-orbital="1" data-orbital-x="0.62" data-orbital-s="1.1" data-orbital-o="0.22" aria-labelledby="h-present">
       <SectionHead id="present" title="the present" />
       <div className="lede">
         <p>
