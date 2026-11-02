@@ -233,9 +233,12 @@ function Cloud({ data, theme, reduced, labels, labelEls, labelLayer }: CloudProp
     // pin the labels to their spots on the cloud
     const layer = labelLayer.current;
     if (layer) {
-      layer.style.opacity = String(p.labels);
-      layer.style.visibility = p.labels < 0.02 ? 'hidden' : 'visible';
-      if (p.labels >= 0.02) {
+      // labels only make sense on the settled hero shape, so they leave as
+      // soon as the cloud starts moving on, not halfway through the morph
+      const vis = THREE.MathUtils.smoothstep(p.labels, 0.75, 1);
+      layer.style.opacity = String(vis);
+      layer.style.visibility = vis < 0.02 ? 'hidden' : 'visible';
+      if (vis >= 0.02) {
         g.updateMatrixWorld();
         labels.forEach((lab, i) => {
           const el = labelEls.current[i];
