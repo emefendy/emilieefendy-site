@@ -125,6 +125,10 @@ export type Block = { kind: 'p'; text: string } | { kind: 'list'; items: string[
 export type Work = {
   slug: string;
   title: string;
+  /** a few words for the index row */
+  tags: string;
+  /** what floats next to the cursor in the index; logos get a white card */
+  cover: { src: string; kind: 'logo' | 'shot' };
   nonprofit?: boolean;
   logo?: { src: string; alt: string };
   when?: string;
@@ -148,6 +152,8 @@ const ALSF_SCREENS = ['Fundraisers near you', 'Personal fundraising page', 'Quic
 export const WORKS: Work[] = [
   {
     slug: 'chw-central',
+    tags: 'RAG · WordPress · Lead engineer',
+    cover: { src: 'logos/chw-central.png', kind: 'logo' },
     title: 'Central Healthcare Workers',
     nonprofit: true,
     logo: { src: 'logos/chw-central.png', alt: 'CHW Central logo' },
@@ -176,6 +182,8 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'computers-4-people',
+    tags: 'Electron · Next.js · Computer use',
+    cover: { src: 'logos/computers-4-people.png', kind: 'logo' },
     title: 'Computers 4 People',
     nonprofit: true,
     logo: { src: 'logos/computers-4-people.png', alt: 'Computers 4 People logo' },
@@ -202,6 +210,8 @@ export const WORKS: Work[] = [
   },
   {
     slug: '412-food-rescue',
+    tags: 'i18n · 3 languages',
+    cover: { src: 'logos/412-food-rescue.png', kind: 'logo' },
     title: '412 Food Rescue',
     nonprofit: true,
     logo: { src: 'logos/412-food-rescue.png', alt: '412 Food Rescue logo' },
@@ -226,6 +236,8 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'steel-city-codes',
+    tags: 'Director · Hackathons',
+    cover: { src: 'previews/scc.jpg', kind: 'shot' },
     title: 'Steel City Codes',
     nonprofit: true,
     logo: { src: 'logos/steel-city-codes.png', alt: 'Steel City Codes logo' },
@@ -257,6 +269,8 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'alsf',
+    tags: 'UX · Figma',
+    cover: { src: 'decks/alsf/01.jpg', kind: 'shot' },
     title: 'Alex’s Lemonade Stand Foundation',
     nonprofit: true,
     logo: { src: 'logos/alsf.png', alt: 'Alex’s Lemonade Stand Foundation logo' },
@@ -298,6 +312,8 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'first-racquet',
+    tags: 'UX · iOS',
+    cover: { src: 'decks/first-racquet/02.jpg', kind: 'shot' },
     title: 'First Racquet',
     nonprofit: true,
     keywords: 'tennis ios app ux design angola',
@@ -332,6 +348,8 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'breakthrough',
+    tags: 'Physics · Global finalist',
+    cover: { src: 'previews/bjc.jpg', kind: 'shot' },
     title: 'Breakthrough Junior Challenge',
     when: 'Global Physics Finalist, 1 of 5 ($400K grand prize)',
     keywords: 'physics higgs video science communication finalist',
@@ -358,6 +376,8 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'evergreen',
+    tags: 'SwiftUI · Pitch',
+    cover: { src: 'decks/evergreen/01.jpg', kind: 'shot' },
     title: 'For Evergreen',
     when: 'Pitched @ Technovation Houston · 2024',
     keywords: 'swiftui ios climate carbon gpt pitch',
@@ -382,6 +402,8 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'wecode',
+    tags: 'Programming · Conference',
+    cover: { src: 'previews/wecode.jpg', kind: 'shot' },
     title: 'Harvard WECode x Build@HUB Vietnam',
     when: 'Director of Programming · Harvard WECode',
     keywords: 'conference women in tech panel vietnam',
