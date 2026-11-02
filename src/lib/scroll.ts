@@ -1,9 +1,9 @@
-const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+import { scrollToEl } from './smoothScroll';
 
 /** Scroll something into view and give it a brief glow so the eye can find it. */
 export function reveal(el: Element | null, { flash = true, scrollTo = el }: { flash?: boolean; scrollTo?: Element | null } = {}) {
   if (!el) return;
-  (scrollTo ?? el).scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
+  scrollToEl(scrollTo ?? el);
   if (!flash) return;
   el.classList.remove('flash');
   // restart the animation if it's already running

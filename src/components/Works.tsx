@@ -1,126 +1,117 @@
-import type { CSSProperties, KeyboardEvent } from 'react';
-import { WORKS, type Media, type Slide, type Work } from '../content';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { WORKS } from '../content';
 import { SectionHead } from './SectionHead';
 
-type Props = {
-  selected: string;
-  onSelect: (slug: string) => void;
-  onOpenSlides: (slides: Slide[], index: number) => void;
-};
+type Props = { onOpen: (slug: string) => void };
 
-const NPO = <span className="npo">501(c)(3)</span>;
+const pad = (i: number) => String(i + 1).padStart(2, '0');
 
-export function Works({ selected, onSelect, onOpenSlides }: Props) {
-  // up/down walks the list like a listbox: move focus and open as you go
+export function Works({ onOpen }: Props) {
+  const [hover, setHover] = useState<number | null>(null);
+
   const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>, i: number) => {
     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
     e.preventDefault();
-    const step = e.key === 'ArrowDown' ? 1 : -1;
-    const next = WORKS[(i + step + WORKS.length) % WORKS.length]!;
-    document.getElementById('b-' + next.slug)?.focus();
-    onSelect(next.slug);
+    const next = (i + (e.key === 'ArrowDown' ? 1 : -1) + WORKS.length) % WORKS.length;
+    document.getElementById('b-' + WORKS[next]!.slug)?.focus();
   };
 
   return (
     <section id="works" aria-labelledby="h-works">
       <SectionHead id="works" title="the works" />
-      <div className="tl" style={{ '--n': WORKS.length } as CSSProperties}>
-        {WORKS.map((w, i) => {
-          const on = w.slug === selected;
-          return [
+      <ol className={'wk' + (hover !== null ? ' hovering' : '')} onMouseLeave={() => setHover(null)}>
+        {WORKS.map((w, i) => (
+          <li key={w.slug} className={hover === i ? 'on' : undefined}>
             <button
-              key={'b' + w.slug}
-              className="tl-btn"
+              type="button"
               id={'b-' + w.slug}
-              aria-expanded={on}
-              aria-controls={'p-' + w.slug}
-              onClick={() => onSelect(w.slug)}
+              className="wk-row"
+              data-cursor="open"
+              onClick={() => onOpen(w.slug)}
+              onMouseEnter={() => setHover(i)}
               onKeyDown={(e) => onKeyDown(e, i)}
             >
-              <span className="o">
-                {w.title} {w.nonprofit && NPO}
+              <span className="wk-n">{pad(i)}</span>
+              <span className="wk-t">
+                {w.title}
+                {w.nonprofit && <span className="npo">501(c)(3)</span>}
               </span>
-            </button>,
-            <WorkPanel key={'p' + w.slug} work={w} hidden={!on} onOpenSlides={onOpenSlides} />,
-          ];
-        })}
-      </div>
+              <span className="wk-tags">{w.tags}</span>
+              <span className="wk-go" aria-hidden="true">
+                →
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <Follower index={hover} />
     </section>
   );
 }
 
-function WorkPanel({ work: w, hidden, onOpenSlides }: { work: Work; hidden: boolean; onOpenSlides: Props['onOpenSlides'] }) {
+/**
+ * The preview card that trails the cursor over the index. Every cover is
+ * mounted up front (so it's decoded before you hover) in one tall strip, and
+ * the strip slides to whichever row you're on. It leans into the direction
+ * you're moving.
+ */
+function Follower({ index }: { index: number | null }) {
+  const el = useRef<HTMLDivElement>(null);
+  const [fine] = useState(() => window.matchMedia('(pointer: fine)').matches);
+  // keep showing the last cover while the card fades out
+  const [last, setLast] = useState(0);
+  if (index !== null && index !== last) setLast(index);
+
+  useEffect(() => {
+    if (!fine) return;
+    const target = { x: 0, y: 0 };
+    const pos = { x: 0, y: 0 };
+    let first = true;
+    let raf = 0;
+    const onMove = (e: PointerEvent) => {
+      target.x = e.clientX;
+      target.y = e.clientY;
+      if (first) {
+        pos.x = target.x + 56;
+        pos.y = target.y;
+        first = false;
+      }
+    };
+    const loop = () => {
+      // sit just right of the pointer so the title you're on stays readable,
+      // but don't run off the edge of the screen
+      const w = el.current?.firstElementChild?.clientWidth ?? 300;
+      const tx = Math.min(target.x + 56, window.innerWidth - w - 24);
+      const vx = tx - pos.x;
+      pos.x += vx * 0.14;
+      pos.y += (target.y - pos.y) * 0.14;
+      const tilt = Math.max(-10, Math.min(10, vx * 0.06));
+      if (el.current) el.current.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) rotate(${tilt}deg)`;
+      raf = requestAnimationFrame(loop);
+    };
+    loop();
+    window.addEventListener('pointermove', onMove, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('pointermove', onMove);
+    };
+  }, [fine]);
+
+  if (!fine) return null;
   return (
-    <div className="tl-panel" id={'p-' + w.slug} role="region" aria-labelledby={'b-' + w.slug} hidden={hidden}>
-      {w.logo && (
-        <div className="logo-card">
-          <img src={w.logo.src} alt={w.logo.alt} loading="lazy" />
-        </div>
-      )}
-      <h3>
-        {w.title} {w.nonprofit && NPO}
-      </h3>
-      {w.when && <p className="when">{w.when}</p>}
-      {w.body.map((b, i) =>
-        b.kind === 'p' ? (
-          <p className="x" key={i}>
-            {b.text}
-          </p>
-        ) : (
-          <ul className="x-list" key={i}>
-            {b.items.map((it) => (
-              <li key={it}>{it}</li>
-            ))}
-          </ul>
-        ),
-      )}
-      {w.media && <WorkMedia media={w.media} onOpenSlides={onOpenSlides} />}
-      {w.links.length > 0 && (
-        <p className="w-links">
-          {w.links.map((l, i) => (
-            <span key={l.href}>
-              {i > 0 && '  '}
-              <a href={l.href} target="_blank" rel="noopener">
-                → {l.label}
-              </a>
-            </span>
+    <div className={'wk-follow' + (index !== null ? ' show' : '')} ref={el} aria-hidden="true">
+      <div className="wk-follow-in">
+        <div
+          className="wk-strip"
+          style={{ height: `${WORKS.length * 100}%`, transform: `translateY(${(-last * 100) / WORKS.length}%)` }}
+        >
+          {WORKS.map((w) => (
+            <div key={w.slug} className={'wk-cover ' + w.cover.kind} style={{ height: `${100 / WORKS.length}%` }}>
+              <img src={w.cover.src} alt="" decoding="async" />
+            </div>
           ))}
-        </p>
-      )}
+        </div>
+      </div>
     </div>
   );
-}
-
-function WorkMedia({ media, onOpenSlides }: { media: Media; onOpenSlides: Props['onOpenSlides'] }) {
-  switch (media.kind) {
-    case 'deck':
-      return (
-        <div className={'deck deck-' + media.layout}>
-          <p className="deck-label">{media.label}</p>
-          <div className="deck-strip">
-            {media.slides.map((s, i) => (
-              <button
-                key={s.full}
-                className="deck-thumb"
-                type="button"
-                aria-label={'Open ' + s.label}
-                onClick={() => onOpenSlides(media.slides, i)}
-              >
-                <img src={s.thumb} alt="" loading="lazy" />
-              </button>
-            ))}
-          </div>
-        </div>
-      );
-    case 'preview':
-      return (
-        <a className="preview-card" href={media.href} target="_blank" rel="noopener">
-          <img src={media.src} alt={media.alt} loading="lazy" width={media.width} height={media.height} />
-          <span>
-            <span>{media.host}</span>
-            <span aria-hidden="true">↗</span>
-          </span>
-        </a>
-      );
-  }
 }

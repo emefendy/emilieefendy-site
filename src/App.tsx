@@ -1,31 +1,38 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Component, lazy, Suspense, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { EXPERIENCE, WORKS, type Slide } from './content';
-import { useLattice } from './hooks/useLattice';
 import { useTheme } from './hooks/useTheme';
 import { useHotkeys } from './hooks/useHotkeys';
 import { reveal } from './lib/scroll';
 import { slugify } from './lib/slug';
+import { lockScroll, reducedMotion, startSmoothScroll } from './lib/smoothScroll';
 import { buildCommands } from './palette/commands';
 import { CommandPalette } from './palette/CommandPalette';
+import { Readout } from './orbital/Readout';
 import { Nav } from './components/Nav';
 import { Hero } from './components/Hero';
+import { Marquee } from './components/Marquee';
 import { Present } from './components/Present';
 import { Past } from './components/Past';
 import { Works } from './components/Works';
+import { CaseStudy } from './components/CaseStudy';
 import { Extras } from './components/Extras';
 import { Footer } from './components/Footer';
 import { Lightbox, type LightboxState } from './components/Lightbox';
+import { Cursor } from './components/Cursor';
 import { Toast } from './components/Toast';
 
-const DEFAULT_WORK = WORKS[0]!.slug;
+// three.js is most of the bundle; the text shouldn't wait on it
+const OrbitalCanvas = lazy(() => import('./orbital/OrbitalCanvas'));
 
-// Two columns on wide screens: the panel starts at the top of the section, so
-// scroll there or you land halfway down the write-up. Stacked on phones: the
-// panel opens right under its button, so scroll to the button.
-function revealWork(slug: string, flash = true) {
-  const btn = document.getElementById('b-' + slug);
-  const stacked = window.matchMedia('(max-width: 680px)').matches;
-  reveal(btn, { flash, scrollTo: stacked ? btn : document.getElementById('works') });
+/** No WebGL (old hardware, blocked GPU) shouldn't take the page down with it. */
+class Quiet extends Component<{ children: ReactNode }, { failed: boolean }> {
+  override state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  override render() {
+    return this.state.failed ? null : this.props.children;
+  }
 }
 
 /** #works/412-food-rescue → '412-food-rescue' */
@@ -36,30 +43,27 @@ function workFromHash(): string | null {
 }
 
 export function App() {
-  const canvas = useRef<HTMLCanvasElement>(null);
-  const hero = useRef<HTMLElement>(null);
-  useLattice(canvas, hero);
-
   const { resolved: theme, toggle: toggleTheme } = useTheme();
-  const [work, setWork] = useState(() => workFromHash() ?? DEFAULT_WORK);
+  const [reduced] = useState(reducedMotion);
+  const [work, setWork] = useState<string | null>(workFromHash);
   const [openXp, setOpenXp] = useState<ReadonlySet<string>>(() => new Set([EXPERIENCE[0]!.org]));
   const [slides, setSlides] = useState<LightboxState>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [toast, setToast] = useState<{ msg: string; id: number } | null>(null);
 
-  const selectWork = useCallback((slug: string) => {
+  useEffect(startSmoothScroll, []);
+  useEffect(() => lockScroll('palette', paletteOpen), [paletteOpen]);
+  useEffect(() => lockScroll('slides', !!slides), [slides]);
+
+  // replace rather than push: flipping through projects shouldn't fill up the back button
+  const openWork = useCallback((slug: string) => {
     setWork(slug);
-    // replace rather than push: clicking through projects shouldn't fill up the back button
     history.replaceState(null, '', '#works/' + slug);
   }, []);
-
-  const openWork = useCallback(
-    (slug: string) => {
-      selectWork(slug);
-      requestAnimationFrame(() => revealWork(slug));
-    },
-    [selectWork],
-  );
+  const closeWork = useCallback(() => {
+    setWork(null);
+    history.replaceState(null, '', '#works');
+  }, []);
 
   const openExperience = useCallback((org: string) => {
     setOpenXp((s) => new Set(s).add(org));
@@ -78,25 +82,17 @@ export function App() {
   const openSlides = useCallback((list: Slide[], index: number) => setSlides({ slides: list, index }), []);
   const showToast = useCallback((msg: string) => setToast({ msg, id: Date.now() }), []);
 
-  // deep link on first load, and keep up with back/forward
   useEffect(() => {
-    const fromHash = workFromHash();
-    if (fromHash) {
-      // wait a frame for layout (and the fonts) before scrolling
-      requestAnimationFrame(() => revealWork(fromHash, false));
-    }
-    const onHash = () => {
-      const s = workFromHash();
-      if (s) setWork(s);
-    };
+    const onHash = () => setWork(workFromHash());
     window.addEventListener('hashchange', onHash);
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  // the slide viewer is a modal <dialog> in the top layer; don't open on top of it
+  // modals live in the top layer; don't open the palette underneath one
+  const modalOpen = !!slides || !!work;
   useHotkeys({
-    'mod+k': () => !slides && setPaletteOpen((o) => !o),
-    '/': () => !slides && setPaletteOpen(true),
+    'mod+k': () => !modalOpen && setPaletteOpen((o) => !o),
+    '/': () => !modalOpen && setPaletteOpen(true),
   });
 
   const commands = useMemo(
@@ -106,19 +102,31 @@ export function App() {
 
   return (
     <>
-      <canvas id="field" ref={canvas} aria-hidden="true" />
+      <Quiet>
+        <Suspense fallback={null}>
+          <OrbitalCanvas theme={theme} reduced={reduced} />
+        </Suspense>
+      </Quiet>
       <Nav theme={theme} onToggleTheme={toggleTheme} onOpenPalette={() => setPaletteOpen(true)} />
-      <main className="wrap">
-        <Hero ref={hero} />
-        <Present />
-        <Past open={openXp} onToggle={toggleXp} />
-        <Works selected={work} onSelect={selectWork} onOpenSlides={openSlides} />
-        <Extras />
-        <Footer />
+      <main>
+        <div className="wrap">
+          <Hero />
+        </div>
+        <Marquee />
+        <div className="wrap">
+          <Present />
+          <Past open={openXp} onToggle={toggleXp} />
+          <Works onOpen={openWork} />
+          <Extras />
+          <Footer />
+        </div>
       </main>
+      <Readout />
+      <CaseStudy slug={work} onClose={closeWork} onNavigate={openWork} onOpenSlides={openSlides} />
       <Lightbox state={slides} onChange={setSlides} />
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} />
       {toast && <Toast key={toast.id} message={toast.msg} onDone={() => setToast(null)} />}
+      <Cursor />
     </>
   );
 }

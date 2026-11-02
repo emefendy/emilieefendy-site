@@ -14,9 +14,13 @@ npm run build    # → dist/
 ## Where things are
 
 - `src/content.ts` – everything the site says. Edit this, not the components.
+- `src/orbital/` – the particle cloud. ~34k points sampled from real hydrogen
+  wavefunctions (|ψ|², in a Web Worker), morphing 3d_z² → 2p_z → 4f_xyz → 3d_xy → 1s
+  as you scroll, colored by the sign of ψ. Click anywhere to measure: the cloud
+  collapses onto one sampled position and the readout shows its r in Bohr radii.
+  `orbitals.test.ts` checks the sampler against ⟨r⟩ = (3n² − l(l+1))/2.
 - `src/palette/` – the command palette. No library; the ranking is in `search.ts`
   and the fuzzy matcher it uses is `src/lib/fuzzy.ts`.
-- `src/hooks/useLattice.ts` – the canvas grid behind the hero.
 - `public/` – images, slide decks, `CNAME`.
 
 Links into a project work: `emilieefendy.com/#works/412-food-rescue`.
