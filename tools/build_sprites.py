@@ -47,6 +47,12 @@ SPRITES = {
     "leaf": ("fx/leaf.png", 5, 6, "figure"),
     "boat": ("props/boat.png", 13, 0, "figure"),
     "smoke": ("fx/smoke.png", 14, 3, "smoke"),
+    # me, for the intro dialog and the landing page; drawn bigger by CSS.
+    # "pixel" = already pixel art (the hand-drawn placeholder): keep every
+    # colour exactly. Switch to "figure" for a generated sheet.
+    "me-idle": ("me/me-idle.png", 31, 2, "pixel"),
+    "me-wave": ("me/me-wave.png", 31, 6, "pixel"),
+    "me-talk": ("me/me-talk.png", 31, 8, "pixel"),
 }
 
 
@@ -123,9 +129,13 @@ def frame_boxes(rgba: Image.Image, min_gap: int = 8) -> list[tuple[int, int, int
     return boxes
 
 
-def shrink_frame(rgba: Image.Image, scale: float, soft: bool) -> Image.Image:
+def shrink_frame(rgba: Image.Image, scale: float, soft: bool, exact: bool = False) -> Image.Image:
     w = max(1, round(rgba.width * scale))
     h = max(1, round(rgba.height * scale))
+    if exact:
+        small = rgba.resize((w, h), Image.Resampling.NEAREST)
+        small.putalpha(small.getchannel("A").point(lambda v: 255 if v > 120 else 0))
+        return small
     if not soft:
         rgba = rgba.filter(ImageFilter.UnsharpMask(radius=3, percent=120, threshold=2))
     small = rgba.resize((w, h), Image.Resampling.BOX)
@@ -154,9 +164,19 @@ def darken_edges(rgba: Image.Image) -> Image.Image:
     return out
 
 
+def feet_x(rgba: Image.Image) -> int:
+    """Middle of the opaque pixels in the bottom third: where the figure stands."""
+    a = rgba.getchannel("A")
+    w, h = a.size
+    data = a.load()
+    xs = [x for y in range(h - max(1, h // 3), h) for x in range(w) if data[x, y]]
+    return round(sum(xs) / len(xs)) if xs else w // 2
+
+
 def build_sprite(name: str, file: str, height: int, fps: int, kind: str) -> dict:
     src = Image.open(SRC / file).convert("RGB")
     soft = kind == "smoke"
+    exact = kind == "pixel"
     keyed = key_soft(src) if soft else key_hard(src)
     boxes = frame_boxes(keyed)
     if not boxes:
@@ -164,19 +184,25 @@ def build_sprite(name: str, file: str, height: int, fps: int, kind: str) -> dict
     # one scale for the whole sheet, from the tallest frame, so frames stay consistent
     tallest = max(b[3] - b[1] for b in boxes)
     scale = height / tallest
-    frames = [shrink_frame(keyed.crop(b), scale, soft) for b in boxes]
-    if not soft:
+    frames = [shrink_frame(keyed.crop(b), scale, soft, exact) for b in boxes]
+    if not soft and not exact:
         frames = [darken_edges(f) for f in frames]
-    fw = max(f.width for f in frames)
+    # Line frames up by the feet, not the bounding box, so an arm that swings
+    # out (a wave, a stride) doesn't shove the whole body sideways.
+    anchors = [feet_x(f) for f in frames]
+    half = max(max(a, f.width - a) for a, f in zip(anchors, frames))
+    fw = 2 * half
     fh = max(f.height for f in frames)
     strip = Image.new("RGBA", (fw * len(frames), fh), (0, 0, 0, 0))
-    for i, f in enumerate(frames):
-        # centred horizontally, standing on the bottom row
-        strip.alpha_composite(f, (i * fw + (fw - f.width) // 2, fh - f.height))
-    colors = 40 if not soft else 6
-    rgb = quantize(strip.convert("RGB"), colors).convert("RGBA")
-    rgb.putalpha(strip.getchannel("A"))
-    rgb.save(OUT / f"{name}.png", optimize=True)
+    for i, (f, a) in enumerate(zip(frames, anchors)):
+        strip.alpha_composite(f, (i * fw + half - a, fh - f.height))
+    if exact:
+        strip.save(OUT / f"{name}.png", optimize=True)
+    else:
+        colors = 40 if not soft else 6
+        rgb = quantize(strip.convert("RGB"), colors).convert("RGBA")
+        rgb.putalpha(strip.getchannel("A"))
+        rgb.save(OUT / f"{name}.png", optimize=True)
     return {"src": f"campus/{name}.png", "frames": len(frames), "w": fw, "h": fh, "fps": fps}
 
 

@@ -458,3 +458,61 @@ export const PROGRAMS = [
   'Inside DRW',
   'Two Sigma New Seekers Summit',
 ];
+
+/* ---------- talking to me ---------- */
+
+/** The dialog boxes on a first visit, one per Next. */
+export const INTRO: readonly string[] = [
+  'Hi there! I’m Emilie, a Harvard student studying computer science and physics, with a concurrent master’s in CS.',
+  'Nice to meet you! A few things about me: I love building things that real people end up using, and I love working with nonprofits to make them.',
+  'I’ve worked with local food rescue teams and a group getting computers to families who need them, all the way to international healthcare organizations and social legislators in Japan.',
+  'I also love to teach. I lead two cohorts of students at Harvard Tech for Social Good, and every week I give a two-hour lecture on anything from Git to JavaScript to AI research.',
+  'That’s me! Walk into any building on campus to see more, or click me if you want to ask something.',
+];
+
+export type Faq = {
+  q: string;
+  a: string;
+  /** a building the answer points to */
+  go?: SceneId;
+  links?: Link[];
+  /** special answers the landing page handles itself */
+  special?: 'replay';
+};
+
+export const FAQ: readonly Faq[] = [
+  {
+    q: 'What do you study?',
+    a: 'Computer science and physics at Harvard, with a concurrent master’s in CS. Some favorites: Theoretical Physics (I’m a course assistant for it), Machine Learning and Reinforcement Learning.',
+    go: 'education',
+  },
+  {
+    q: 'What have you built?',
+    a: 'Semantic search and a cited RAG chatbot over 3,600+ resources for CHW Central’s 60,000+ readers, a desktop assistant that can see your screen for Computers 4 People, and the translation system behind 412 Food Rescue’s app.',
+    go: 'projects',
+  },
+  {
+    q: 'Where have you worked?',
+    a: 'Most recently QuEra Quantum Computing, building a data pipeline and training agents against custom evals. Before that Mercor, Katmai Computing, NC State and Rice’s quantum initiative.',
+    go: 'experience',
+  },
+  {
+    q: 'Do you teach?',
+    a: 'Yes! I lead two cohorts at Harvard Tech for Social Good with a two-hour lecture every week, and I’m a course assistant for Theoretical Physics.',
+  },
+  {
+    q: 'What do you do for fun?',
+    a: 'Cello! I’ve been first chair at the Midwest Convention and played in the Texas All-State Symphony. I was also voted most likely to beat my physics teacher in a pun battle.',
+    go: 'extras',
+  },
+  {
+    q: 'How can I reach you?',
+    a: 'Email is best, I read everything: eefendy@college.harvard.edu. I’m on GitHub and LinkedIn too.',
+    links: [
+      { label: 'Email', href: 'mailto:eefendy@college.harvard.edu' },
+      { label: 'GitHub', href: 'https://github.com/emefendy' },
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/emilie-efendy-587153243/' },
+    ],
+  },
+  { q: 'Can I see the intro again?', a: '', special: 'replay' },
+];

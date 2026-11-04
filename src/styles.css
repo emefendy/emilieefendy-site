@@ -85,13 +85,12 @@ h2 {
   font-size: clamp(19px, 2vw, 24px); line-height: 1.45; letter-spacing: -.015em; max-width: 36em; margin: 0 0 .9em; color: var(--ink-2);
 }
 .lede em { font-style: normal; color: var(--ink); }
-.lede a, .intro a { text-decoration: underline; text-decoration-color: var(--muted); text-underline-offset: 3px; text-decoration-thickness: 1px; }
-.lede a:hover, .intro a:hover { color: var(--accent); }
+.lede a { text-decoration: underline; text-decoration-color: var(--muted); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.lede a:hover { color: var(--accent); }
 .lede a.to-works { color: var(--ink); text-decoration-color: var(--accent); text-decoration-thickness: 1.5px; }
 .lede a.to-works:hover { text-decoration-thickness: 2px; }
 .lede + .sub-label { margin-top: 30px; }
 .link-list + .sub-label { margin-top: 48px; }
-.intro { color: var(--ink-2); font-size: 18px; max-width: 58ch; margin: 0; }
 
 /* the past: education rows, then date list + detail panel */
 .sub-label { font-family: var(--mono); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
@@ -471,4 +470,77 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) {
   .campus-cam, .scene-panel, .scene-shade, .hero-copy { transition: none !important; }
+}
+
+/* ---------- pixel me ---------- */
+.pxme { position: relative; display: inline-block; }
+.pxme-img { position: absolute; left: 50%; bottom: 0; translate: -50% 0; background-repeat: no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
+
+/* ---------- the hello ---------- */
+.hello { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; pointer-events: none; }
+.hello.on { pointer-events: auto; }
+.hello-shade { position: absolute; inset: 0; background: color-mix(in oklab, var(--bg) 72%, transparent); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); opacity: 0; transition: opacity .5s var(--ease); }
+.hello.on .hello-shade { opacity: 1; }
+.hello-box {
+  position: relative; width: min(560px, 100%); box-sizing: border-box; padding: 20px 24px 18px; cursor: pointer;
+  background: var(--surface); border: 3px solid var(--ink-2); outline: 3px solid var(--bg); box-shadow: 0 0 0 6px var(--line-strong), 0 30px 70px -12px #000d;
+  opacity: 0; translate: 0 18px; transition: opacity .35s var(--ease), translate .5s var(--ease);
+}
+.hello.on .hello-box { opacity: 1; translate: 0 0; transition-delay: .15s; }
+.hello-me { display: flex; justify-content: center; margin: 4px 0 2px; padding-bottom: 6px; border-bottom: 3px dotted var(--line-strong); }
+.hello-name { margin: 12px 0 6px; font-family: var(--pixel); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+.hello-text { margin: 0; min-height: 6.4em; font-family: var(--pixel); font-size: 15px; line-height: 1.6; color: var(--ink); }
+.hello-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.hello-dots { display: flex; gap: 6px; }
+.hello-dots i { width: 6px; height: 6px; background: var(--line-strong); }
+.hello-dots i.on { background: var(--accent); }
+.hello-next, .hello-skip {
+  appearance: none; cursor: pointer; font-family: var(--pixel); font-size: 13px; letter-spacing: .1em; text-transform: uppercase;
+  background: none; border: 0; color: var(--ink); padding: 6px 4px;
+}
+.hello-next span { display: inline-block; color: var(--accent); }
+.hello-next.ready span { animation: nudge .9s steps(2) infinite; }
+@keyframes nudge { 50% { translate: 4px 0; } }
+.hello-next:hover, .hello-next:focus-visible { color: var(--accent); }
+.hello-skip { position: absolute; top: 10px; right: 12px; font-size: 11px; color: var(--ink-3); }
+.hello-skip:hover { color: var(--ink); }
+
+/* ---------- name, me and the speech bubble ---------- */
+.hero-h { margin-bottom: 26px; }
+.askme { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 30px; transition: opacity .3s var(--ease); }
+.askme-me { appearance: none; padding: 0; margin-top: 6px; border: 0; background: none; cursor: pointer; flex: none; }
+.askme-me:hover .pxme-img { filter: brightness(1.08); }
+.bubble {
+  position: relative; flex: 1; min-width: 0; padding: 12px 14px;
+  background: var(--surface); border: 3px solid var(--ink-2); outline: 3px solid var(--bg); box-shadow: 0 0 0 6px var(--line-strong);
+  font-family: var(--pixel); font-size: 13px; line-height: 1.55;
+}
+/* the tail, pointing at me */
+.bubble::before, .bubble::after { content: ''; position: absolute; top: 18px; width: 0; height: 0; border-style: solid; }
+.bubble::before { left: -15px; border-width: 8px 12px 8px 0; border-color: transparent var(--ink-2) transparent transparent; }
+.bubble::after { left: -9px; top: 21px; border-width: 5px 8px 5px 0; border-color: transparent var(--surface) transparent transparent; }
+.bubble button, .bubble a { font: inherit; color: inherit; }
+.bubble-ask { appearance: none; background: none; border: 0; padding: 0; cursor: pointer; letter-spacing: .04em; }
+.bubble-ask span { color: var(--accent); display: inline-block; animation: nudge .9s steps(2) infinite; }
+.bubble-ask:hover { color: var(--accent); }
+.bubble-h, .bubble-q { margin: 0 0 8px; color: var(--accent); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; padding-right: 18px; }
+.bubble-qs { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.bubble-qs button { appearance: none; width: 100%; text-align: left; background: none; border: 0; padding: 4px 0; cursor: pointer; color: var(--ink-2); }
+.bubble-qs button span { color: transparent; }
+.bubble-qs button:hover, .bubble-qs button:focus-visible { color: var(--ink); }
+.bubble-qs button:hover span, .bubble-qs button:focus-visible span { color: var(--accent); }
+.bubble-x { position: absolute; top: 6px; right: 8px; appearance: none; background: none; border: 0; cursor: pointer; font-size: 16px !important; color: var(--ink-3) !important; }
+.bubble-a { margin: 0; min-height: 4.6em; color: var(--ink); cursor: pointer; }
+.bubble-acts { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; opacity: 0; transition: opacity .3s; }
+.bubble-acts.on { opacity: 1; }
+.bubble-go, .bubble-more { appearance: none; background: none; border: 0; padding: 2px 0; cursor: pointer; text-decoration: none; font-size: 12px !important; letter-spacing: .06em; text-transform: uppercase; }
+.bubble-go { color: var(--accent) !important; }
+.bubble-more { color: var(--ink-3) !important; }
+.bubble-go:hover, .bubble-more:hover { color: var(--ink) !important; }
+.links { grid-auto-flow: column; justify-content: start; gap: 18px; }
+.links li:first-child a { font-size: 0; gap: 0; }
+.links li:first-child a::after { content: 'email'; font-size: 14px; margin-left: 9px; }
+@media (prefers-reduced-motion: reduce) {
+  .hello-box, .hello-shade, .askme { transition: none !important; }
+  .hello-next.ready span, .bubble-ask span { animation: none; }
 }
