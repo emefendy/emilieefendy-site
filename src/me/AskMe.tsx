@@ -29,6 +29,16 @@ export function AskMe({ onGo, onReplay, hidden }: Props) {
     setMode({ kind: 'answer', i });
   };
 
+  // >> in the corner: finish the line, or once it's out, go on to the next question
+  const nextQuestion = () => {
+    if (mode.kind !== 'answer') return;
+    if (!done) return finish();
+    let i = mode.i;
+    do i = (i + 1) % FAQ.length;
+    while (FAQ[i]?.special);
+    setMode({ kind: 'answer', i });
+  };
+
   const talking = mode.kind === 'answer' && !done;
   const scene = faq?.go ? SCENES.find((s) => s.id === faq.go) : undefined;
 
@@ -91,6 +101,14 @@ export function AskMe({ onGo, onReplay, hidden }: Props) {
                 Ask something else
               </button>
             </div>
+            <button
+              type="button"
+              className={'bubble-ff' + (done ? ' ready' : '')}
+              onClick={nextQuestion}
+              aria-label={done ? 'Next question' : 'Skip to the end'}
+            >
+              »
+            </button>
           </>
         )}
       </div>
