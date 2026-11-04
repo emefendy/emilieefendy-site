@@ -518,12 +518,10 @@ export const FAQ: readonly Faq[] = [
   },
   {
     q: 'How can I reach you?',
-    a: 'Email is best, I read everything: eefendy@college.harvard.edu. I’m on GitHub and LinkedIn too.',
+    a: 'You can reach me through email: eefendy@college.harvard.edu. LinkedIn works too!',
     links: [
       { label: 'Email', href: 'mailto:eefendy@college.harvard.edu' },
-      { label: 'GitHub', href: 'https://github.com/emefendy' },
       { label: 'LinkedIn', href: 'https://www.linkedin.com/in/emilie-efendy-587153243/' },
     ],
   },
-  { q: 'Can I see the intro again?', a: '', special: 'replay' },
 ];
