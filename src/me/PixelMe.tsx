@@ -11,7 +11,7 @@ export function loadManifest() {
   return manifest;
 }
 
-export type Mood = 'idle' | 'wave' | 'talk' | 'think';
+export type Mood = 'idle' | 'wave' | 'talk' | 'think' | 'surprised';
 
 /** `height` is how tall she's drawn on screen, in CSS pixels. */
 type Props = { mood: Mood; height?: number; className?: string };
@@ -31,8 +31,8 @@ export function PixelMe({ mood, height = 160, className }: Props) {
         const s = m.sprites;
         const [idle, wave, talk] = [s['me-idle'], s['me-wave'], s['me-talk']];
         if (live && idle && wave && talk) {
-          // an older art build without the thinking pose just stands there instead
-          setSheets({ idle, wave, talk, think: s['me-think'] ?? idle });
+          // an older art build without the newer poses just stands there instead
+          setSheets({ idle, wave, talk, think: s['me-think'] ?? idle, surprised: s['me-surprised'] ?? idle });
         }
       })
       .catch(() => {});
@@ -43,7 +43,7 @@ export function PixelMe({ mood, height = 160, className }: Props) {
 
   useEffect(() => {
     setFrame(0);
-    if (!sheets || reducedMotion()) return;
+    if (!sheets || reducedMotion() || mood === 'surprised') return;
     if (mood === 'idle' || mood === 'think') {
       // stand still, blink now and then
       let t: ReturnType<typeof setTimeout>;

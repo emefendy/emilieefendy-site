@@ -555,3 +555,9 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 .bubble-ff.ready { color: var(--accent) !important; animation: nudge .9s steps(2) infinite; }
 .bubble-ff:hover { color: var(--ink) !important; }
 @media (prefers-reduced-motion: reduce) { .bubble-ff.ready { animation: none; } }
+
+/* poked: a startled little hop */
+.poked .pxme { animation: hop .38s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes hop { 30% { translate: 0 -10px; } 60% { translate: 0 0; } 75% { translate: 0 -3px; } }
+.hello-me .pxme { cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .poked .pxme { animation: none; } }

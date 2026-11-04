@@ -152,6 +152,13 @@
       "w": 120,
       "h": 195,
       "fps": 2
+    },
+    "me-surprised": {
+      "src": "campus/me-surprised.png",
+      "frames": 1,
+      "w": 122,
+      "h": 195,
+      "fps": 0
     }
   }
 }

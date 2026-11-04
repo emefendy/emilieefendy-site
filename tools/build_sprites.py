@@ -55,6 +55,7 @@ SPRITES = {
     "me-wave": ("me/me-wave.png", 195, 4, "keep"),
     "me-talk": ("me/me-talk.png", 195, 6, "keep"),
     "me-think": ("me/me-think.png", 195, 2, "keep"),
+    "me-surprised": ("me/me-surprised.png", 195, 0, "keep"),
 }
 
 
