@@ -464,6 +464,7 @@ export const PROGRAMS = [
 /** The dialog boxes on a first visit, one per Next. */
 export const INTRO: readonly string[] = [
   'Hi there! I’m Emilie, a Harvard student studying computer science and physics, with a concurrent master’s in CS.',
+  'A little bit about me: I’m super passionate about building projects that get used by real people, and I’ve had the chance to do that by partnering with both local and global nonprofits. I also love teaching! I lead weekly two-hour lectures for Harvard Tech for Social Good on topics like Git and React, and I host office hours as a course assistant for Theoretical Physics.',
   'I hope you enjoy exploring my site! I’ll be around if you have any questions.',
 ];
 
