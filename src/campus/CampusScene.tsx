@@ -43,7 +43,15 @@ type Person = {
 
 // a 5x7 pixel question mark for the bubble over someone you've clicked
 const QUESTION = ['01110', '10001', '00001', '00110', '00100', '00000', '00100'];
-type Bird = { x: number; y: number; vx: number; phase: number; wob: number };
+type Bird = {
+  x: number;
+  y: number;
+  vx: number;
+  phase: number;
+  wob: number;
+  /** shot down: falling, tumbling, and where it'll stop */
+  fall?: { vy: number; spin: number; angle: number; age: number };
+};
 type Puff = { x: number; y: number; age: number; life: number };
 type Leaf = { x: number; y: number; age: number; life: number; sway: number };
 
@@ -177,13 +185,28 @@ export function CampusScene({ focus, onOpen, reduced }: Props) {
         }
         return hit;
       };
+      // where a bird is drawn right now (it bobs as it flies)
+      const birdY = (b: Bird) => (b.fall ? b.y : b.y + Math.sin(time * 2 + b.phase) * b.wob);
+      const birdAt = ([px, py]: [number, number]) => {
+        const s = sheets['bird']?.info;
+        if (!s) return null;
+        const r = (Math.max(s.w, s.h) / 2 + 5) / S; // small, so a little forgiving
+        return birds.find((b) => !b.fall && Math.hypot(px - b.x, py - (birdY(b) - s.h / 2 / S)) < r) ?? null;
+      };
       const onMove = (e: PointerEvent) => {
         pointer = toSrc(e);
-        cv.style.cursor = personAt(pointer) ? 'pointer' : '';
+        cv.style.cursor = personAt(pointer) || birdAt(pointer) ? 'pointer' : '';
       };
       const onLeave = () => (pointer = null);
       const onClick = (e: MouseEvent) => {
-        const p = personAt(toSrc(e));
+        const at = toSrc(e);
+        const b = birdAt(at);
+        if (b) {
+          b.y = birdY(b);
+          b.fall = { vy: -60, spin: (b.vx > 0 ? 1 : -1) * (5 + rand() * 4), angle: 0, age: 0 };
+          return;
+        }
+        const p = personAt(at);
         if (p) p.pausedUntil = time + 2;
       };
       cv.parentElement?.addEventListener('pointermove', onMove);
@@ -209,6 +232,32 @@ export function CampusScene({ focus, onOpen, reduced }: Props) {
         ctx.globalAlpha = 1;
       };
       const fpsOf = (name: string) => sheets[name]?.info.fps ?? 6;
+
+      // a shot bird: wings stuck out, upside down and tumbling, a few feathers, fading as it drops
+      const fallingBird = (b: Bird) => {
+        const s = sheets['bird'];
+        const f = b.fall;
+        if (!s || !f) return;
+        const { w, h } = s.info;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, 1 - Math.max(0, f.age - 1.2) / 1);
+        ctx.translate(Math.round(b.x * S), Math.round(b.y * S - h / 2));
+        ctx.rotate(Math.PI + f.angle);
+        if (b.vx < 0) ctx.scale(-1, 1);
+        ctx.drawImage(s.img, 1 * w, 0, w, h, -w / 2, -h / 2, w, h);
+        ctx.restore();
+        // feathers puffing out where it was hit
+        if (f.age < 0.6) {
+          ctx.globalAlpha = 1 - f.age / 0.6;
+          ctx.fillStyle = '#e9dcc6';
+          for (let i = 0; i < 4; i++) {
+            const a = i * 1.7 + b.phase;
+            const r = 2 + f.age * 14;
+            ctx.fillRect(Math.round(b.x * S + Math.cos(a) * r), Math.round(b.y * S - h / 2 + Math.sin(a) * r - f.age * 4), 1, 1);
+          }
+        }
+        ctx.globalAlpha = 1;
+      };
 
       // a little speech bubble with a pixel ? in it, its tail at (x, y); pops in, then fades at the end
       const question = (x: number, y: number, left: number) => {
@@ -261,8 +310,23 @@ export function CampusScene({ focus, onOpen, reduced }: Props) {
           }
           nextFlock = 14 + rand() * 10;
         }
-        for (const b of birds) b.x += b.vx * dt;
-        for (let i = birds.length - 1; i >= 0; i--) if (birds[i]!.x < -120 || birds[i]!.x > SRC_W + 120) birds.splice(i, 1);
+        for (const b of birds) {
+          if (!b.fall) {
+            b.x += b.vx * dt;
+            continue;
+          }
+          // a little pop up, then gravity; it keeps some of its forward speed and tumbles
+          const f = b.fall;
+          f.age += dt;
+          f.vy += 520 * dt;
+          b.y += f.vy * dt;
+          b.x += b.vx * 0.25 * dt;
+          f.angle += f.spin * dt;
+        }
+        for (let i = birds.length - 1; i >= 0; i--) {
+          const b = birds[i]!;
+          if (b.x < -120 || b.x > SRC_W + 120 || (b.fall && b.fall.age > 2.2)) birds.splice(i, 1);
+        }
 
         // chimney smoke, staggered
         CHIMNEYS.forEach(([x, y], i) => {
@@ -370,7 +434,11 @@ export function CampusScene({ focus, onOpen, reduced }: Props) {
           sprite('leaf', Math.floor(l.age * fpsOf('leaf')), (l.x + Math.sin(l.age * 2.4 + l.sway) * 8) * S, l.y * S, false, 1 - k * k);
         }
         for (const b of birds) {
-          const y = b.y + Math.sin(time * 2 + b.phase) * b.wob;
+          if (b.fall) {
+            fallingBird(b);
+            continue;
+          }
+          const y = birdY(b);
           sprite('bird', Math.floor(time * fpsOf('bird') + b.phase), b.x * S, y * S, b.vx < 0);
         }
       };
