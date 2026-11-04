@@ -128,23 +128,30 @@
     "me-idle": {
       "src": "campus/me-idle.png",
       "frames": 2,
-      "w": 12,
-      "h": 31,
+      "w": 124,
+      "h": 195,
       "fps": 2
     },
     "me-wave": {
       "src": "campus/me-wave.png",
-      "frames": 4,
-      "w": 20,
-      "h": 31,
-      "fps": 6
+      "frames": 2,
+      "w": 130,
+      "h": 195,
+      "fps": 4
     },
     "me-talk": {
       "src": "campus/me-talk.png",
       "frames": 2,
-      "w": 12,
-      "h": 31,
-      "fps": 8
+      "w": 142,
+      "h": 195,
+      "fps": 6
+    },
+    "me-think": {
+      "src": "campus/me-think.png",
+      "frames": 2,
+      "w": 120,
+      "h": 195,
+      "fps": 2
     }
   }
 }

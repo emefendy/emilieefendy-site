@@ -474,7 +474,8 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 
 /* ---------- pixel me ---------- */
 .pxme { position: relative; display: inline-block; }
-.pxme-img { position: absolute; left: 50%; bottom: 0; translate: -50% 0; background-repeat: no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; }
+/* drawn smaller than its source, so ordinary smoothing keeps the pixel look crisp */
+.pxme-img { position: absolute; left: 50%; bottom: 0; translate: -50% 0; background-repeat: no-repeat; }
 
 /* ---------- the hello ---------- */
 .hello { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; pointer-events: none; }
@@ -507,8 +508,8 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 
 /* ---------- name, me and the speech bubble ---------- */
 .hero-h { margin-bottom: 26px; }
-.askme { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 30px; transition: opacity .3s var(--ease); }
-.askme-me { appearance: none; padding: 0; margin-top: 6px; border: 0; background: none; cursor: pointer; flex: none; }
+.askme { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 30px; transition: opacity .3s var(--ease); }
+.askme-me { appearance: none; padding: 0; margin-top: -6px; margin-left: -10px; border: 0; background: none; cursor: pointer; flex: none; }
 .askme-me:hover .pxme-img { filter: brightness(1.08); }
 .bubble {
   position: relative; flex: 1; min-width: 0; padding: 12px 14px;

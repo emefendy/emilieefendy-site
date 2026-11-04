@@ -11,15 +11,16 @@ export function loadManifest() {
   return manifest;
 }
 
-export type Mood = 'idle' | 'wave' | 'talk';
+export type Mood = 'idle' | 'wave' | 'talk' | 'think';
 
-type Props = { mood: Mood; scale?: number; className?: string };
+/** `height` is how tall she's drawn on screen, in CSS pixels. */
+type Props = { mood: Mood; height?: number; className?: string };
 
 /**
  * Pixel me. Every sheet is anchored at the feet in the middle of its frame,
  * so swapping moods (or an arm swinging out to wave) never moves her.
  */
-export function PixelMe({ mood, scale = 5, className }: Props) {
+export function PixelMe({ mood, height = 160, className }: Props) {
   const [sheets, setSheets] = useState<Record<Mood, SpriteInfo> | null>(null);
   const [frame, setFrame] = useState(0);
 
@@ -28,8 +29,10 @@ export function PixelMe({ mood, scale = 5, className }: Props) {
     loadManifest()
       .then((m) => {
         const s = m.sprites;
-        if (live && s['me-idle'] && s['me-wave'] && s['me-talk']) {
-          setSheets({ idle: s['me-idle'], wave: s['me-wave'], talk: s['me-talk'] });
+        const [idle, wave, talk] = [s['me-idle'], s['me-wave'], s['me-talk']];
+        if (live && idle && wave && talk) {
+          // an older art build without the thinking pose just stands there instead
+          setSheets({ idle, wave, talk, think: s['me-think'] ?? idle });
         }
       })
       .catch(() => {});
@@ -41,7 +44,7 @@ export function PixelMe({ mood, scale = 5, className }: Props) {
   useEffect(() => {
     setFrame(0);
     if (!sheets || reducedMotion()) return;
-    if (mood === 'idle') {
+    if (mood === 'idle' || mood === 'think') {
       // stand still, blink now and then
       let t: ReturnType<typeof setTimeout>;
       const blink = () => {
@@ -61,6 +64,8 @@ export function PixelMe({ mood, scale = 5, className }: Props) {
 
   if (!sheets) return <span className={'pxme ' + (className ?? '')} aria-hidden="true" />;
   const s = sheets[mood];
+  // every pose shares one height, so one scale keeps her the same size in each
+  const scale = height / s.h;
   const boxW = Math.max(...Object.values(sheets).map((x) => x.w));
   return (
     <span

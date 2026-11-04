@@ -63,7 +63,7 @@ export function IntroDialog({ open, onDone }: Props) {
           Skip
         </button>
         <div className="hello-me">
-          <PixelMe mood={open ? mood : 'idle'} scale={6} />
+          <PixelMe mood={open ? mood : 'idle'} height={200} />
         </div>
         <p className="hello-name">Emilie</p>
         <p className="hello-text">
