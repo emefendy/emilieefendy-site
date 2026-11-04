@@ -10,6 +10,7 @@ export function Hero({ focus, onOpen, onReplay, reduced }: HeroProps) {
   return (
     <main className={'hero' + (focus ? ' away' : '')} id="top">
       <div className="hero-copy">
+        <p className="hero-eyebrow">CS &amp; Physics · Harvard</p>
         <h1 className="hero-h">Emilie Efendy</h1>
         <AskMe onGo={onOpen} onReplay={onReplay} />
         <ul className="links">

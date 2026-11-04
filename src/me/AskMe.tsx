@@ -79,7 +79,7 @@ export function AskMe({ onGo, onReplay, hidden }: Props) {
             <div className={'bubble-acts' + (done ? ' on' : '')}>
               {scene && (
                 <button type="button" className="bubble-go" onClick={() => onGo(scene.id)}>
-                  Walk into {scene.label} <span aria-hidden="true">▸</span>
+                  View {scene.label} <span aria-hidden="true">▸</span>
                 </button>
               )}
               {faq.links?.map((l) => (
