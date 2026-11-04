@@ -1,6 +1,5 @@
 import { EMAIL, SOCIALS, type SceneId } from '../content';
 import { CampusScene } from '../campus/CampusScene';
-import { MOD_KEY } from '../lib/keys';
 import { GithubIcon, LinkedinIcon, MailIcon } from './Icons';
 
 type HeroProps = { focus: SceneId | null; onOpen: (scene: SceneId) => void; reduced: boolean };
@@ -12,13 +11,21 @@ export function Hero({ focus, onOpen, reduced }: HeroProps) {
       <div className="hero-copy">
         <p className="hero-eyebrow">CS &amp; Physics · Harvard</p>
         <h1 className="hero-h">Emilie Efendy</h1>
-        <p className="hero-p">
-          I’m a Harvard student studying computer science and physics, with a concurrent master’s in CS. I like hard problems,
-          and I really care about building software for social good.
-        </p>
-        <p className="hero-hint">
-          Click a building to walk in · <kbd>{MOD_KEY === '⌘' ? '⌘K' : 'Ctrl K'}</kbd> to search
-        </p>
+        <div className="hero-p">
+          <p>
+            Hi there! I’m Emilie, a Harvard student studying computer science and physics, with a concurrent master’s in CS.
+          </p>
+          <p>
+            I love taking things from 0 → 1, especially with nonprofits, where what I build lands in front of real people the
+            week it ships. I design around what users actually reach for, not what looks good in a demo, and I’m usually the
+            first to pick up a new tool just to see how far it goes.
+          </p>
+          <p>
+            I also love passing on what I learn: as a course assistant for theoretical physics, and as Director of Exploration
+            at Harvard Tech for Social Good, where I lead two cohorts of students building apps for problems on Harvard’s
+            campus and teach a two-hour weekly lecture on software engineering and UX.
+          </p>
+        </div>
         <ul className="links">
           <li>
             <a href={'mailto:' + EMAIL}>

@@ -376,13 +376,15 @@ html.in-scene, html.in-scene body { overflow: hidden; }
   padding: clamp(28px, 6vh, 64px) clamp(20px, 5vw, 64px); overflow: hidden;
 }
 .hero-copy {
-  position: relative; z-index: 3; max-width: 360px;
+  position: relative; z-index: 3; width: min(400px, 34vw); max-width: none;
   transition: opacity .45s var(--ease), translate .6s var(--cam);
 }
 .hero.away .hero-copy { opacity: 0; translate: -24px 0; pointer-events: none; }
 .hero-eyebrow { margin: 0 0 16px; font-family: var(--pixel); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
 .hero-h { margin: 0 0 18px; font-weight: 400; font-size: clamp(48px, 5.6vw, 84px); line-height: .92; letter-spacing: -.045em; }
-.hero-p { margin: 0 0 20px; font-size: 17px; line-height: 1.5; color: var(--ink-2); }
+.hero-p { margin: 0 0 24px; font-size: 15.5px; line-height: 1.5; color: var(--ink-2); }
+.hero-p p { margin: 0 0 .8em; }
+.hero-p p:first-child { color: var(--ink); }
 .hero-hint { margin: 0 0 22px; font-family: var(--pixel); font-size: 12px; letter-spacing: .04em; color: var(--ink-3); }
 .hero-hint kbd { font: inherit; color: var(--ink-2); padding: 1px 5px; border: 1px solid var(--line-strong); border-radius: 4px; }
 .links { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
@@ -392,7 +394,8 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 
 .campus {
   position: absolute; z-index: 2; top: 50%; right: clamp(-40px, -2vw, 0px); translate: 0 -50%;
-  width: min(72vw, calc(100svh * 1.36), 1180px); aspect-ratio: 1415 / 1111;
+  /* everything right of the text column (whose left edge is the hero padding) */
+  width: min(calc(100vw - min(400px, 34vw) - clamp(20px, 5vw, 64px) - 16px), calc(100svh * 1.36), 1180px); aspect-ratio: 1415 / 1111;
   opacity: 0; transition: opacity 1.2s ease .2s;
 }
 .campus.on { opacity: 1; }
@@ -462,7 +465,7 @@ html.in-scene, html.in-scene body { overflow: hidden; }
   .hero { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 8px; padding-top: 16px; }
   .campus { order: -1; position: relative; top: auto; right: auto; translate: none; width: calc(100% + 40px); margin: 0 -20px; }
   .campus-tag { height: 22px; font-size: 9.5px; padding: 0 6px; gap: 4px; }
-  .hero-copy { max-width: none; }
+  .hero-copy { width: auto; }
   .scene-shade { background: linear-gradient(0deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 80%, transparent) 52%, transparent 62%); }
   .scene-panel { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; height: 56svh; translate: 0 24px; }
 }
