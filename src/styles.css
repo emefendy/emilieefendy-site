@@ -535,7 +535,7 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 .bubble-qs button:hover, .bubble-qs button:focus-visible { color: var(--ink); }
 .bubble-qs button:hover span, .bubble-qs button:focus-visible span { color: var(--accent); }
 .bubble-x { position: absolute; top: 6px; right: 8px; appearance: none; background: none; border: 0; cursor: pointer; font-size: 16px !important; color: var(--ink-3) !important; }
-.bubble-a { margin: 0; min-height: 4.6em; color: var(--ink); cursor: pointer; }
+.bubble-a { margin: 0; min-height: 4.6em; color: var(--ink); cursor: pointer; white-space: pre-line; }
 .bubble-acts { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; opacity: 0; transition: opacity .3s; }
 .bubble-acts.on { opacity: 1; }
 .bubble-go, .bubble-more { appearance: none; background: none; border: 0; padding: 2px 0; cursor: pointer; text-decoration: none; font-size: 12px !important; letter-spacing: .06em; text-transform: uppercase; }

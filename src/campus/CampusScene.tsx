@@ -33,7 +33,16 @@ function rng(seed: number) {
   };
 }
 
-type Person = { base: string; walk: Walker; trail: { t: number; x: number; y: number }[] };
+type Person = {
+  base: string;
+  walk: Walker;
+  trail: { t: number; x: number; y: number }[];
+  /** clicked: stands still with a ? over their head until this time */
+  pausedUntil: number;
+};
+
+// a 5x7 pixel question mark for the bubble over someone you've clicked
+const QUESTION = ['01110', '10001', '00001', '00110', '00100', '00000', '00100'];
 type Bird = { x: number; y: number; vx: number; phase: number; wob: number };
 type Puff = { x: number; y: number; age: number; life: number };
 type Leaf = { x: number; y: number; age: number; life: number; sway: number };
@@ -135,7 +144,7 @@ export function CampusScene({ focus, onOpen, reduced }: Props) {
         { base: 'student-b', walk: { from: 'pe', to: 'ps', t: 0.2, speed: 23 } },
         { base: 'jogger', walk: { from: 'b', to: 'j', t: 0.1, speed: 52 } },
         { base: 'cyclist', walk: { from: 'srv', to: 'j', t: 0.4, speed: 72 } },
-      ].map((p) => ({ ...p, walk: p.walk as Walker, trail: [] as Person['trail'] }));
+      ].map((p) => ({ ...p, walk: p.walk as Walker, trail: [] as Person['trail'], pausedUntil: 0 }));
       const professor = people[1]!;
 
       const birds: Bird[] = [];
@@ -147,13 +156,39 @@ export function CampusScene({ focus, onOpen, reduced }: Props) {
       let squirrel: { at: Pt; from: Pt; hop: number } = { at: LAWNS[0]!, from: LAWNS[0]!, hop: 0 };
       let pointer: [number, number] | null = null;
 
-      const onMove = (e: PointerEvent) => {
+      const toSrc = (e: PointerEvent | MouseEvent): [number, number] => {
         const r = cv.getBoundingClientRect();
-        pointer = [((e.clientX - r.left) / r.width) * SRC_W, ((e.clientY - r.top) / r.height) * SRC_H];
+        return [((e.clientX - r.left) / r.width) * SRC_W, ((e.clientY - r.top) / r.height) * SRC_H];
+      };
+      // who's under the pointer: a box around each walker's sprite, a little generous so they're easy to hit
+      const personAt = ([px, py]: [number, number]) => {
+        let hit: Person | null = null;
+        let best = Infinity;
+        for (const p of people) {
+          const [x, y] = position(p.walk);
+          const s = sheets[`${p.base}-front`]?.info;
+          if (!s) continue;
+          const halfW = (s.w / 2 + 3) / S;
+          const h = (s.h + 3) / S;
+          if (Math.abs(px - x) <= halfW && py <= y + 3 / S && py >= y - h && y < best) {
+            hit = p;
+            best = y;
+          }
+        }
+        return hit;
+      };
+      const onMove = (e: PointerEvent) => {
+        pointer = toSrc(e);
+        cv.style.cursor = personAt(pointer) ? 'pointer' : '';
       };
       const onLeave = () => (pointer = null);
+      const onClick = (e: MouseEvent) => {
+        const p = personAt(toSrc(e));
+        if (p) p.pausedUntil = time + 2;
+      };
       cv.parentElement?.addEventListener('pointermove', onMove);
       cv.parentElement?.addEventListener('pointerleave', onLeave);
+      cv.addEventListener('click', onClick);
 
       // draw one frame of a sheet with its feet at (x, y) in art pixels
       const sprite = (name: string, frame: number, x: number, y: number, flip = false, alpha = 1) => {
@@ -175,13 +210,35 @@ export function CampusScene({ focus, onOpen, reduced }: Props) {
       };
       const fpsOf = (name: string) => sheets[name]?.info.fps ?? 6;
 
+      // a little speech bubble with a pixel ? in it, its tail at (x, y); pops in, then fades at the end
+      const question = (x: number, y: number, left: number) => {
+        const pop = Math.min(1, (2 - left) / 0.12);
+        const alpha = Math.min(1, left / 0.25);
+        const bx = Math.round(x - 4);
+        const by = Math.round(y - 10 + (1 - pop) * 3);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#2a1d12';
+        ctx.fillRect(bx - 1, by - 1, 11, 11);
+        ctx.fillRect(bx + 3, by + 10, 3, 2);
+        ctx.fillStyle = '#f6ecda';
+        ctx.fillRect(bx, by, 9, 9);
+        ctx.fillRect(bx + 4, by + 9, 1, 2);
+        ctx.fillStyle = '#c2551f';
+        QUESTION.forEach((row, j) =>
+          [...row].forEach((c, i) => {
+            if (c === '1') ctx.fillRect(bx + 2 + i, by + 1 + j, 1, 1);
+          }),
+        );
+        ctx.globalAlpha = 1;
+      };
+
       let time = 0;
       let last = performance.now();
 
       const update = (dt: number) => {
         time += dt;
         for (const p of people) {
-          p.walk = step(p.walk, dt, rand);
+          if (time >= p.pausedUntil) p.walk = step(p.walk, dt, rand);
           const [x, y] = position(p.walk);
           p.trail.push({ t: time, x, y });
           while (p.trail.length > 2 && p.trail[0]!.t < time - 2) p.trail.shift();
@@ -280,7 +337,15 @@ export function CampusScene({ focus, onOpen, reduced }: Props) {
           const [x, y] = position(p.walk);
           const f = heading(p.walk);
           const name = `${p.base}-${f.sheet}`;
-          ground.push({ y, draw: () => sprite(name, Math.floor(time * fpsOf(name)), x * S, y * S, f.flip) });
+          const paused = time < p.pausedUntil;
+          ground.push({
+            y,
+            draw: () => {
+              // standing still on a paused frame, otherwise mid-stride
+              sprite(name, paused ? 0 : Math.floor(time * fpsOf(name)), x * S, y * S, f.flip);
+              if (paused) question(x * S, y * S - (sheets[name]?.info.h ?? 18) - 2, p.pausedUntil - time);
+            },
+          });
         }
         // the dog trails the professor by about a second
         const trail = professor.trail;
@@ -336,6 +401,7 @@ export function CampusScene({ focus, onOpen, reduced }: Props) {
       cleanup = () => {
         io.disconnect();
         cv.parentElement?.removeEventListener('pointermove', onMove);
+        cv.removeEventListener('click', onClick);
         cv.parentElement?.removeEventListener('pointerleave', onLeave);
       };
     })().catch(() => {});
