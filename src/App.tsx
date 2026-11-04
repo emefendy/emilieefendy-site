@@ -11,6 +11,16 @@ import { Scene } from './components/Scene';
 import { CaseStudy } from './components/CaseStudy';
 import { Lightbox, type LightboxState } from './components/Lightbox';
 import { Toast } from './components/Toast';
+import { IntroDialog } from './me/IntroDialog';
+
+const MET = 'met';
+const hasMet = () => {
+  try {
+    return localStorage.getItem(MET) === '1';
+  } catch {
+    return false;
+  }
+};
 
 /** #projects → 'projects' */
 function sceneFromHash(): SceneId | null {
@@ -27,6 +37,16 @@ export function App() {
   const [slides, setSlides] = useState<LightboxState>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [toast, setToast] = useState<{ msg: string; id: number } | null>(null);
+  // say hello on a first visit (straight into a building's link skips it)
+  const [intro, setIntro] = useState(() => !hasMet() && !sceneFromHash());
+  const finishIntro = useCallback(() => {
+    setIntro(false);
+    try {
+      localStorage.setItem(MET, '1');
+    } catch {
+      /* fine, they'll get a hello next time too */
+    }
+  }, []);
 
   // Opening a building from the campus adds a history entry, so the browser's
   // back button walks you out again; hopping between buildings doesn't.
@@ -78,7 +98,7 @@ export function App() {
   const openSlides = useCallback((list: Slide[], index: number) => setSlides({ slides: list, index }), []);
   const showToast = useCallback((msg: string) => setToast({ msg, id: Date.now() }), []);
 
-  const modalOpen = !!slides || !!work;
+  const modalOpen = !!slides || !!work || intro;
   useHotkeys({
     'mod+k': () => !modalOpen && setPaletteOpen((o) => !o),
     '/': () => !modalOpen && setPaletteOpen(true),
@@ -106,13 +126,14 @@ export function App() {
         openExperience,
         openSlides,
         toast: showToast,
+        replayIntro: () => setIntro(true),
       }),
     [theme, toggleTheme, openScene, goHome, openExperience, openSlides, showToast],
   );
 
   return (
     <>
-      <Hero focus={scene} onOpen={openScene} reduced={reduced} />
+      <Hero focus={scene} onOpen={openScene} onReplay={() => setIntro(true)} reduced={reduced} />
       <Scene
         scene={scene}
         onClose={goHome}
@@ -124,6 +145,7 @@ export function App() {
       <CaseStudy slug={work} onClose={() => setWork(null)} onNavigate={setWork} onOpenSlides={openSlides} />
       <Lightbox state={slides} onChange={setSlides} />
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} />
+      <IntroDialog open={intro} onDone={finishIntro} />
       {toast && <Toast key={toast.id} message={toast.msg} onDone={() => setToast(null)} />}
     </>
   );

@@ -13,6 +13,7 @@ type Deps = {
   openSlides: (slides: Slide[], index: number) => void;
   toast: (msg: string) => void;
   goHome: () => void;
+  replayIntro: () => void;
 };
 
 const REPO = 'https://github.com/emefendy/emilieefendy-site';
@@ -77,6 +78,14 @@ export function buildCommands(d: Deps): Command[] {
       keywords: 'theme appearance dark light night',
       group: 'Actions',
       run: d.toggleTheme,
+    },
+    {
+      id: 'intro',
+      title: 'Say hello again',
+      hint: 'replay the intro',
+      keywords: 'intro dialog hi hello welcome',
+      group: 'Actions',
+      run: d.replayIntro,
     },
     {
       id: 'copy-email',

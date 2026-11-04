@@ -9,7 +9,7 @@
     "student-a-front": {
       "src": "campus/student-a-front.png",
       "frames": 4,
-      "w": 9,
+      "w": 10,
       "h": 18,
       "fps": 7
     },
@@ -30,7 +30,7 @@
     "student-b-back": {
       "src": "campus/student-b-back.png",
       "frames": 4,
-      "w": 9,
+      "w": 10,
       "h": 18,
       "fps": 7
     },
@@ -44,49 +44,49 @@
     "professor-back": {
       "src": "campus/professor-back.png",
       "frames": 4,
-      "w": 9,
+      "w": 10,
       "h": 18,
       "fps": 6
     },
     "jogger-front": {
       "src": "campus/jogger-front.png",
       "frames": 4,
-      "w": 10,
+      "w": 12,
       "h": 18,
       "fps": 10
     },
     "jogger-back": {
       "src": "campus/jogger-back.png",
       "frames": 4,
-      "w": 10,
+      "w": 12,
       "h": 18,
       "fps": 10
     },
     "cyclist-front": {
       "src": "campus/cyclist-front.png",
       "frames": 4,
-      "w": 13,
+      "w": 14,
       "h": 20,
       "fps": 9
     },
     "cyclist-back": {
       "src": "campus/cyclist-back.png",
       "frames": 4,
-      "w": 12,
+      "w": 14,
       "h": 20,
       "fps": 9
     },
     "dog-front": {
       "src": "campus/dog-front.png",
       "frames": 4,
-      "w": 9,
+      "w": 10,
       "h": 9,
       "fps": 10
     },
     "dog-back": {
       "src": "campus/dog-back.png",
       "frames": 4,
-      "w": 9,
+      "w": 12,
       "h": 9,
       "fps": 10
     },
@@ -100,30 +100,51 @@
     "bird": {
       "src": "campus/bird.png",
       "frames": 3,
-      "w": 10,
+      "w": 16,
       "h": 7,
       "fps": 8
     },
     "leaf": {
       "src": "campus/leaf.png",
       "frames": 4,
-      "w": 5,
+      "w": 6,
       "h": 5,
       "fps": 6
     },
     "boat": {
       "src": "campus/boat.png",
       "frames": 1,
-      "w": 10,
+      "w": 12,
       "h": 13,
       "fps": 0
     },
     "smoke": {
       "src": "campus/smoke.png",
       "frames": 3,
-      "w": 11,
+      "w": 12,
       "h": 14,
       "fps": 3
+    },
+    "me-idle": {
+      "src": "campus/me-idle.png",
+      "frames": 2,
+      "w": 12,
+      "h": 31,
+      "fps": 2
+    },
+    "me-wave": {
+      "src": "campus/me-wave.png",
+      "frames": 4,
+      "w": 20,
+      "h": 31,
+      "fps": 6
+    },
+    "me-talk": {
+      "src": "campus/me-talk.png",
+      "frames": 2,
+      "w": 12,
+      "h": 31,
+      "fps": 8
     }
   }
 }
