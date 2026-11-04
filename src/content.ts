@@ -105,7 +105,6 @@ export const ORGS: { name: string; role?: string }[] = [
 export const HS_COURSES = [
   'Modern Physics',
   'Multivariable Calculus',
-  'Data Structures & Algorithms',
   'Organic Chemistry',
   'AP Computer Science A',
   'AP Physics 1, 2 & C',
