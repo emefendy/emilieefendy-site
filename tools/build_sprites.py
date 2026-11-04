@@ -48,11 +48,13 @@ SPRITES = {
     "boat": ("props/boat.png", 13, 0, "figure"),
     "smoke": ("fx/smoke.png", 14, 3, "smoke"),
     # me, for the intro dialog and the landing page; drawn bigger by CSS.
-    # "pixel" = already pixel art (the hand-drawn placeholder): keep every
-    # colour exactly. Switch to "figure" for a generated sheet.
-    "me-idle": ("me/me-idle.png", 31, 2, "pixel"),
-    "me-wave": ("me/me-wave.png", 31, 6, "pixel"),
-    "me-talk": ("me/me-talk.png", 31, 8, "pixel"),
+    # "keep" = already drawn as pixel art, but its pixels don't sit on an even
+    # grid, so snapping to one smears the face. Keep the detail at half size
+    # and let the browser scale it.
+    "me-idle": ("me/me-idle.png", 195, 2, "keep"),
+    "me-wave": ("me/me-wave.png", 195, 4, "keep"),
+    "me-talk": ("me/me-talk.png", 195, 6, "keep"),
+    "me-think": ("me/me-think.png", 195, 2, "keep"),
 }
 
 
@@ -129,9 +131,13 @@ def frame_boxes(rgba: Image.Image, min_gap: int = 8) -> list[tuple[int, int, int
     return boxes
 
 
-def shrink_frame(rgba: Image.Image, scale: float, soft: bool, exact: bool = False) -> Image.Image:
+def shrink_frame(rgba: Image.Image, scale: float, soft: bool, exact: bool | str = False) -> Image.Image:
     w = max(1, round(rgba.width * scale))
     h = max(1, round(rgba.height * scale))
+    if exact == "box":
+        small = rgba.resize((w, h), Image.Resampling.LANCZOS)
+        small.putalpha(small.getchannel("A").point(lambda v: 255 if v > 110 else 0))
+        return small
     if exact:
         small = rgba.resize((w, h), Image.Resampling.NEAREST)
         small.putalpha(small.getchannel("A").point(lambda v: 255 if v > 120 else 0))
@@ -176,7 +182,7 @@ def feet_x(rgba: Image.Image) -> int:
 def build_sprite(name: str, file: str, height: int, fps: int, kind: str) -> dict:
     src = Image.open(SRC / file).convert("RGB")
     soft = kind == "smoke"
-    exact = kind == "pixel"
+    exact: bool | str = "box" if kind == "keep" else kind == "pixel"
     keyed = key_soft(src) if soft else key_hard(src)
     boxes = frame_boxes(keyed)
     if not boxes:

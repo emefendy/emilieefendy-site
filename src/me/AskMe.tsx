@@ -41,7 +41,7 @@ export function AskMe({ onGo, onReplay, hidden }: Props) {
         aria-label="Ask Emilie a question"
         tabIndex={-1}
       >
-        <PixelMe mood={talking ? 'talk' : 'idle'} scale={4} />
+        <PixelMe mood={talking ? 'talk' : mode.kind === 'menu' ? 'think' : 'idle'} height={150} />
       </button>
 
       <div className={'bubble bubble-' + mode.kind} ref={bubble} aria-live="polite">
