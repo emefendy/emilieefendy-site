@@ -23,6 +23,8 @@ export type Experience = {
   meta: string;
   desc: string[];
   stack: string[];
+  /** things to look at: a note, a screenshot, slide decks */
+  show?: { note: string; peek?: Slide; decks?: { label: string; slides: Slide[] }[] };
 };
 
 export const EXPERIENCE: Experience[] = [
@@ -36,6 +38,25 @@ export const EXPERIENCE: Experience[] = [
       'I also worked on the Anthropic × QuEra pilot of a then-unreleased package for research agents.',
     ],
     stack: ['Python', 'Postgres', 'SQL', 'Agents', 'Evals'],
+    show: {
+      note: 'I can’t share the actual code from the repo, but I can share my final presentation slides and a sneak peek of what I built from scratch! I also held an informal AI workshop for some of the more senior researchers who were curious about what’s big in AI right now.',
+      peek: {
+        full: 'previews/quera-platform.jpg',
+        thumb: 'previews/quera-platform-t.jpg',
+        caption: 'Photonics Data Manager · the data tab',
+        label: 'Sneak peek of the Photonics Data Manager I built',
+      },
+      decks: [
+        {
+          label: 'Final presentation · 35 slides',
+          slides: deck('quera', 35, (i) => `QuEra Integrated Photonics Platform · ${i} of 35`, (i) => `QuEra final presentation slide ${i} of 35`),
+        },
+        {
+          label: 'AI workshop · 23 slides',
+          slides: deck('ai-workshop', 23, (i) => `AI Workshop · ${i} of 23`, (i) => `AI workshop slide ${i} of 23`),
+        },
+      ],
+    },
   },
   {
     org: 'Mercor',

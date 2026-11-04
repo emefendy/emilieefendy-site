@@ -8,6 +8,7 @@ import {
   RECOGNITION,
   SCENES,
   type SceneId,
+  type Slide,
 } from '../content';
 import { slugify } from '../lib/slug';
 import { Works } from './Works';
@@ -19,13 +20,14 @@ type Props = {
   openXp: ReadonlySet<string>;
   onToggleXp: (org: string, open: boolean) => void;
   onOpenWork: (slug: string) => void;
+  onOpenSlides: (slides: Slide[], index: number) => void;
 };
 
 /**
  * The panel that slides in once the camera has zoomed into a building. The
  * campus stays alive behind it; this is just the words.
  */
-export function Scene({ scene, onClose, onSwitch, openXp, onToggleXp, onOpenWork }: Props) {
+export function Scene({ scene, onClose, onSwitch, openXp, onToggleXp, onOpenWork, onOpenSlides }: Props) {
   const panel = useRef<HTMLDivElement>(null);
   const back = useRef<HTMLButtonElement>(null);
   const i = SCENES.findIndex((s) => s.id === scene);
@@ -55,7 +57,7 @@ export function Scene({ scene, onClose, onSwitch, openXp, onToggleXp, onOpenWork
               {s.title}
             </h2>
             {s.id === 'education' && <Education />}
-            {s.id === 'experience' && <Experience open={openXp} onToggle={onToggleXp} />}
+            {s.id === 'experience' && <Experience open={openXp} onToggle={onToggleXp} onOpenSlides={onOpenSlides} />}
             {s.id === 'projects' && <Works onOpen={onOpenWork} />}
             {s.id === 'extras' && <Extras />}
             <nav className="scene-next" aria-label="Other buildings">
@@ -138,7 +140,15 @@ function Education() {
   );
 }
 
-function Experience({ open, onToggle }: { open: ReadonlySet<string>; onToggle: (org: string, open: boolean) => void }) {
+function Experience({
+  open,
+  onToggle,
+  onOpenSlides,
+}: {
+  open: ReadonlySet<string>;
+  onToggle: (org: string, open: boolean) => void;
+  onOpenSlides: Props['onOpenSlides'];
+}) {
   return (
     <ul className="link-list">
       {EXPERIENCE.map((x) => (
@@ -163,6 +173,29 @@ function Experience({ open, onToggle }: { open: ReadonlySet<string>; onToggle: (
                 </p>
               ))}
               <p className="stack">{x.stack.join(' · ')}</p>
+              {x.show && (
+                <div className="xp-show">
+                  <p className="xp-note">{x.show.note}</p>
+                  {x.show.peek && (
+                    <button type="button" className="xp-peek" onClick={() => onOpenSlides([x.show!.peek!], 0)} aria-label={'Open ' + x.show.peek.label}>
+                      <img src={x.show.peek.full} alt={x.show.peek.label} loading="lazy" />
+                      <span>{x.show.peek.caption} ↗</span>
+                    </button>
+                  )}
+                  {x.show.decks?.map((d) => (
+                    <div className="deck deck-wide" key={d.label}>
+                      <p className="deck-label">{d.label}</p>
+                      <div className="deck-strip">
+                        {d.slides.map((sl, k) => (
+                          <button key={sl.full} className="deck-thumb" type="button" aria-label={'Open ' + sl.label} onClick={() => onOpenSlides(d.slides, k)}>
+                            <img src={sl.thumb} alt="" loading="lazy" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </details>
         </li>

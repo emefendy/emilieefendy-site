@@ -590,3 +590,21 @@ html.in-scene, html.in-scene body { overflow: hidden; }
   :root { --copy-w: 40vw; }
   .bubble-menu .bubble-qs button { font-size: 11.5px; }
 }
+
+/* what I can show from a role: a note, a screenshot, decks */
+.xp-show { margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--line-strong); }
+.xp-note { margin: 0 0 14px; color: var(--ink); max-width: 72ch; }
+.xp-peek {
+  appearance: none; display: block; width: min(100%, 720px); padding: 0; margin: 0 0 6px; cursor: zoom-in; text-align: left;
+  border: 1px solid var(--line-strong); border-radius: 12px; overflow: hidden; background: var(--surface-2); font: inherit; color: inherit;
+  transition: border-color .2s, transform .2s;
+}
+.xp-peek:hover { border-color: var(--accent); transform: translateY(-1px); }
+.xp-peek img { display: block; width: 100%; height: auto; }
+.xp-peek span { display: block; padding: 8px 12px; font-family: var(--pixel); font-size: 12px; letter-spacing: .04em; color: var(--ink-3); border-top: 1px solid var(--line); }
+.xp-show .deck { margin-top: 18px; }
+/* text stays a readable width, slide strips use the whole panel */
+.scene .link-list .w-body { max-width: none; }
+.scene .link-list .w-body > p, .xp-note { max-width: 72ch; }
+.scene .link-list { grid-template-columns: minmax(0, 1fr); }
+.scene .link-list details, .xp-show { min-width: 0; }
