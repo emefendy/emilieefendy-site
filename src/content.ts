@@ -42,10 +42,11 @@ export const EXPERIENCE: Experience[] = [
     role: 'Project Manager',
     meta: 'San Francisco, CA · May 2026 – Jun 2026',
     desc: [
-      'Organized 100+ domain experts and ran internal trainings on eval design and trajectory analysis. Raised the share of submissions passing benchmarks set by frontier AI lab clients from 41% to 85%.',
-      'Built a Python and React dashboard that lets experts visualize and explore very large datasets intuitively.',
+      'Helped organize 100+ domain experts and ran internal trainings on eval design and trajectory analysis. Raised the share of submissions passing benchmarks set by frontier AI lab clients from 41% to 85%.',
+      'Off the clock, I joined the data team to help program and debug Contigo Data Explorer, a browser-based simulation of a company’s whole corporate workflow. It brings exported data from Zoho CRM, Confluence, MS Teams, Jira, Gmail, Google Drive and a campaign database into one place to explore: pipelines and deals, page trees, chats, sprints and backlogs, mailboxes and files.',
+      'Static JSON viewers sit alongside Supabase-backed views over Postgres, all in vanilla JavaScript on Cloudflare Pages, with large exports pre-chunked to stay under its 25 MiB per-file limit.',
     ],
-    stack: ['Evals', 'Python', 'React', 'Operations'],
+    stack: ['Evals', 'Operations', 'JavaScript', 'Supabase', 'Cloudflare Pages'],
   },
   {
     org: 'Katmai Computing',
