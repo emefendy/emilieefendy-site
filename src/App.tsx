@@ -141,6 +141,7 @@ export function App() {
         openXp={openXp}
         onToggleXp={toggleXp}
         onOpenWork={setWork}
+        onOpenSlides={openSlides}
       />
       <CaseStudy slug={work} onClose={() => setWork(null)} onNavigate={setWork} onOpenSlides={openSlides} />
       <Lightbox state={slides} onChange={setSlides} />
