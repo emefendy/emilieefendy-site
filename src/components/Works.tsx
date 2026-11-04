@@ -47,18 +47,23 @@ export function Works({ onOpen }: Props) {
   );
 }
 
-// wide wordmarks shrink to nothing in a square, so these use a cropped mark instead
+// square marks for the list: cropped from the wide wordmarks, or each site's own icon
 const SQUARE: Record<string, string> = {
   'chw-central': 'logos/badge/chw-central.png',
   'computers-4-people': 'logos/badge/computers-4-people.png',
+  'first-racquet': 'logos/first-racquet.png',
+  breakthrough: 'logos/breakthrough.png',
+  evergreen: 'logos/evergreen.png',
+  wecode: 'logos/wecode.png',
 };
 
-/** A uniform square before each title: the logo if there is one, a monogram if not. */
+/** A uniform square before each title: the logo, or a monogram for anything without one. */
 function Badge({ work: w }: { work: Work }) {
-  if (w.logo) {
+  const src = SQUARE[w.slug] ?? w.logo?.src;
+  if (src) {
     return (
       <span className="wk-badge">
-        <img src={SQUARE[w.slug] ?? w.logo.src} alt="" loading="lazy" />
+        <img src={src} alt="" loading="lazy" />
       </span>
     );
   }
