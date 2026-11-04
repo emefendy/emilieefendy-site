@@ -480,13 +480,13 @@ export type Faq = {
 export const FAQ: readonly Faq[] = [
   {
     q: 'What do you study?',
-    a: 'Computer science and physics at Harvard, with a concurrent master’s in CS. Some favorites: Theoretical Physics (I hold office hours and help grade for it), Machine Learning, Systems Programming, and Evolving Morality: From Primordial Soup to Superintelligent Machines!',
+    a: 'Computer science and physics at Harvard, with a concurrent master’s in CS. Some of my favorite classes: Theoretical Physics (I hold office hours and help with grading), Machine Learning, Systems Programming, and Evolving Morality: From Primordial Soup to Superintelligent Machines!',
     go: 'education',
   },
   {
-    q: 'What have you built?',
+    q: 'What have you built/worked on?',
     a: [
-      'Mostly 0 → 1 tools for nonprofits, used by real people:',
+      '0 → 1 projects, used by thousands of users worldwide:',
       '• CHW Central: AI search + chatbot for 60,000+ health workers',
       '• Computers 4 People: an AI helper for first-time computer users',
       '• 412 Food Rescue: its app in Spanish and French for volunteers',
@@ -501,7 +501,7 @@ export const FAQ: readonly Faq[] = [
   },
   {
     q: 'Do you teach?',
-    a: 'Yes! I lead two cohorts at Harvard Tech for Social Good with a two-hour lecture every week, and I hold office hours and help grade for Theoretical Physics.',
+    a: 'Yes! I lead two cohorts at Harvard Tech for Social Good with a two-hour lecture every week, and I hold office hours and help with grading for Theoretical Physics.',
   },
   {
     q: 'What do you do for fun?',
