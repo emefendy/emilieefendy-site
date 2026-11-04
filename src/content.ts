@@ -501,8 +501,15 @@ export const FAQ: readonly Faq[] = [
     go: 'experience',
   },
   {
-    q: 'Do you teach?',
-    a: 'Yes! I lead two cohorts at Harvard Tech for Social Good with a two-hour lecture every week, and I hold office hours and help with grading for Theoretical Physics.',
+    q: 'What organizations are you involved with?',
+    a: [
+      'At Harvard:',
+      '• Harvard Tech for Social Good: I lead two cohorts and teach weekly lectures',
+      '• HackHarvard: finance & corporate relations',
+      '• Women in Computer Science: Director of Programming for WECode',
+      '• Society of Physics Students, Innovation Labs, and Women in Entrepreneurship',
+    ].join('\n'),
+    go: 'education',
   },
   {
     q: 'What do you do for fun?',
