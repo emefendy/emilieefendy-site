@@ -16,14 +16,14 @@ export function Hero({ focus, onOpen, reduced }: HeroProps) {
             Hi there! I’m Emilie, a Harvard student studying computer science and physics, with a concurrent master’s in CS.
           </p>
           <p>
-            I love taking things from 0 → 1, especially with nonprofits, where what I build lands in front of real people the
-            week it ships. I design around what users actually reach for, not what looks good in a demo, and I’m usually the
-            first to pick up a new tool just to see how far it goes.
+            I love building things that real people end up using. I’ve worked with nonprofits from local food rescue teams and a
+            group getting computers to families who need them, to international healthcare organizations and social legislators
+            in Japan.
           </p>
           <p>
-            I also love passing on what I learn: as a course assistant for theoretical physics, and as Director of Exploration
-            at Harvard Tech for Social Good, where I lead two cohorts of students building apps for problems on Harvard’s
-            campus and teach a two-hour weekly lecture on software engineering and UX.
+            I also love to teach. At Harvard Tech for Social Good, I lead two cohorts of students building apps for problems on
+            our own campus, and every week I give a two-hour lecture on whatever they need next, from Git to JavaScript to AI
+            research.
           </p>
         </div>
         <ul className="links">
