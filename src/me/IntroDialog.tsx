@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { INTRO } from '../content';
 import { PixelMe, type Mood } from './PixelMe';
+import { usePoke } from './usePoke';
 import { useTypewriter } from './useTypewriter';
 
 type Props = { open: boolean; onDone: () => void };
@@ -15,6 +16,7 @@ export function IntroDialog({ open, onDone }: Props) {
   const text = INTRO[page] ?? '';
   const { shown, done, finish } = useTypewriter(open ? text : '');
   const last = page === INTRO.length - 1;
+  const [poked, poke] = usePoke();
 
   useEffect(() => {
     if (open) setPage(0);
@@ -62,8 +64,15 @@ export function IntroDialog({ open, onDone }: Props) {
         >
           Skip
         </button>
-        <div className="hello-me">
-          <PixelMe mood={open ? mood : 'idle'} height={200} />
+        <div
+          className={'hello-me' + (poked ? ' poked' : '')}
+          onClick={(e) => {
+            // poking her isn't the same as clicking on to the next box
+            e.stopPropagation();
+            poke();
+          }}
+        >
+          <PixelMe mood={!open ? 'idle' : poked ? 'surprised' : mood} height={200} />
         </div>
         <p className="hello-name">Emilie</p>
         <p className="hello-text">

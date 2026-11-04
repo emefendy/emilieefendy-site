@@ -5,6 +5,8 @@
 art/campus-art/me/me-sheet.png is the generated sheet, read left to right:
   top row:    idle, blink, wave, wave
   bottom row: think, think (eyes closed), talk (mouth open), talk (closed)
+
+me-surprised.png (when she's poked) is its own single image and needs no splitting.
 """
 from pathlib import Path
 

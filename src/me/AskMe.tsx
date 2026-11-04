@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { FAQ, SCENES, type SceneId } from '../content';
 import { PixelMe } from './PixelMe';
+import { usePoke } from './usePoke';
 import { useTypewriter } from './useTypewriter';
 
 type Props = { onGo: (scene: SceneId) => void; onReplay: () => void; hidden?: boolean };
@@ -13,6 +14,7 @@ export function AskMe({ onGo, onReplay, hidden }: Props) {
   const faq = mode.kind === 'answer' ? FAQ[mode.i] : undefined;
   const { shown, done, finish } = useTypewriter(faq?.a ?? '');
   const bubble = useRef<HTMLDivElement>(null);
+  const [poked, poke] = usePoke();
 
   // keep focus inside the bubble as it changes, so keyboard users aren't dropped
   useEffect(() => {
@@ -46,12 +48,12 @@ export function AskMe({ onGo, onReplay, hidden }: Props) {
     <div className={'askme' + (hidden ? ' gone' : '')}>
       <button
         type="button"
-        className="askme-me"
-        onClick={() => setMode(mode.kind === 'prompt' ? { kind: 'menu' } : mode)}
-        aria-label="Ask Emilie a question"
+        className={'askme-me' + (poked ? ' poked' : '')}
+        onClick={poke}
+        aria-label="Poke Emilie"
         tabIndex={-1}
       >
-        <PixelMe mood={talking ? 'talk' : mode.kind === 'menu' ? 'think' : 'idle'} height={150} />
+        <PixelMe mood={poked ? 'surprised' : talking ? 'talk' : mode.kind === 'menu' ? 'think' : 'idle'} height={150} />
       </button>
 
       <div className={'bubble bubble-' + mode.kind} ref={bubble} aria-live="polite">
