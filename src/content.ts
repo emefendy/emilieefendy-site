@@ -502,7 +502,7 @@ export const FAQ: readonly Faq[] = [
   },
   {
     q: 'What do you do for fun?',
-    a: 'Cello! I’ve been first chair at the Midwest Convention and played in the Texas All-State Symphony. I was also voted most likely to beat my physics teacher in a pun battle.',
+    a: 'I love to run, and I’m currently training for a half marathon! I also love experimenting in the dining hall to see what new recipes I can come up with.',
     go: 'extras',
   },
   {
