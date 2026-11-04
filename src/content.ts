@@ -483,7 +483,7 @@ export type Faq = {
 export const FAQ: readonly Faq[] = [
   {
     q: 'What do you study?',
-    a: 'Computer science and physics at Harvard, with a concurrent master’s in CS. Some favorites: Theoretical Physics (I’m a course assistant for it), Machine Learning and Reinforcement Learning.',
+    a: 'Computer science and physics at Harvard, with a concurrent master’s in CS. Some favorites: Theoretical Physics (I’m a course assistant for it), Machine Learning, Systems Programming, and Evolving Morality: From Primordial Soup to Superintelligent Machines!',
     go: 'education',
   },
   {

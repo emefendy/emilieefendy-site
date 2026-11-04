@@ -545,3 +545,13 @@ html.in-scene, html.in-scene body { overflow: hidden; }
   .hello-box, .hello-shade, .askme { transition: none !important; }
   .hello-next.ready span, .bubble-ask span { animation: none; }
 }
+
+/* >> in the corner of an answer, like the hello box's Next */
+.bubble-answer { padding-bottom: 30px; }
+.bubble-ff {
+  position: absolute; right: 8px; bottom: 4px; appearance: none; background: none; border: 0; padding: 2px 4px; cursor: pointer;
+  font-family: var(--pixel) !important; font-size: 18px !important; line-height: 1; color: var(--ink-3) !important;
+}
+.bubble-ff.ready { color: var(--accent) !important; animation: nudge .9s steps(2) infinite; }
+.bubble-ff:hover { color: var(--ink) !important; }
+@media (prefers-reduced-motion: reduce) { .bubble-ff.ready { animation: none; } }
