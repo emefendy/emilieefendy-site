@@ -59,6 +59,8 @@ function Follower({ index }: { index: number | null }) {
   // keep showing the last cover while the card fades out
   const [last, setLast] = useState(0);
   if (index !== null && index !== last) setLast(index);
+  // don't show the card until we know where the pointer is, or it appears in a corner
+  const [tracking, setTracking] = useState(false);
 
   useEffect(() => {
     if (!fine) return;
@@ -67,6 +69,7 @@ function Follower({ index }: { index: number | null }) {
     let first = true;
     let raf = 0;
     const onMove = (e: PointerEvent) => {
+      setTracking(true);
       target.x = e.clientX;
       target.y = e.clientY;
       if (first) {
@@ -97,7 +100,7 @@ function Follower({ index }: { index: number | null }) {
 
   if (!fine) return null;
   return (
-    <div className={'wk-follow' + (index !== null ? ' show' : '')} ref={el} aria-hidden="true">
+    <div className={'wk-follow' + (index !== null && tracking ? ' show' : '')} ref={el} aria-hidden="true">
       <div className="wk-follow-in">
         <div
           className="wk-strip"

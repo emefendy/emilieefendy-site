@@ -94,7 +94,7 @@ export type Building = { scene: SceneId; label: string; tag: Pt; box: Box };
  */
 export const BUILDINGS: readonly Building[] = [
   { scene: 'education', label: 'Education', tag: [400, 250], box: [190, 165, 615, 525] },
-  { scene: 'experience', label: 'Experience', tag: [1110, 560], box: [880, 475, 1320, 835] },
+  { scene: 'experience', label: 'Experience', tag: [1130, 250], box: [845, 175, 1250, 525] },
   { scene: 'projects', label: 'Projects', tag: [300, 520], box: [105, 455, 560, 825] },
-  { scene: 'extras', label: 'Extras', tag: [1130, 250], box: [845, 175, 1250, 525] },
+  { scene: 'extras', label: 'Extras', tag: [1110, 560], box: [880, 475, 1320, 835] },
 ];

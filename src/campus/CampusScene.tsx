@@ -54,12 +54,11 @@ function framing(outer: DOMRect, box: readonly [number, number, number, number])
   const bw = ((x1 - x0) / SRC_W) * outer.width;
   const bh = ((y1 - y0) / SRC_H) * outer.height;
   const wide = vw > 900;
-  // desktop: panel on the left, building on the right; phone: building on top, panel below
-  const panel = wide ? Math.min(560, vw * 0.42) + 32 : 0;
-  const areaW = wide ? vw - panel : vw;
+  // desktop: fly straight in to fill the screen, then the section opens over it;
+  // phone: building stays on top, section below
   const areaH = wide ? vh : vh * 0.42;
-  const scale = Math.min((areaW * 0.86) / bw, (areaH * 0.84) / bh);
-  const tx = (wide ? panel + areaW / 2 : vw / 2) - (outer.left + cx * outer.width);
+  const scale = Math.min((vw * (wide ? 1.05 : 0.86)) / bw, (areaH * (wide ? 1.05 : 0.84)) / bh);
+  const tx = vw / 2 - (outer.left + cx * outer.width);
   const ty = (wide ? vh / 2 : areaH / 2 + 8) - (outer.top + cy * outer.height);
   return {
     transformOrigin: `${cx * 100}% ${cy * 100}%`,

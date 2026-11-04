@@ -420,20 +420,21 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 .scene { position: fixed; inset: 0; z-index: 5; pointer-events: none; }
 .scene.on { pointer-events: auto; }
 .scene-shade {
-  position: absolute; inset: 0; opacity: 0; transition: opacity .7s var(--ease);
-  background: linear-gradient(90deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 80%, transparent) 34%, transparent 62%);
+  position: absolute; inset: 0; opacity: 0; transition: opacity .6s var(--ease);
+  background: color-mix(in oklab, var(--bg) 55%, transparent);
 }
-.scene.on .scene-shade { opacity: 1; transition-delay: .25s; }
+.scene.on .scene-shade { opacity: 1; transition-delay: .7s; }
+/* the zoom plays first, then the section opens almost full screen over the building */
 .scene-panel {
-  position: absolute; left: clamp(12px, 2vw, 28px); top: clamp(12px, 2vw, 28px); bottom: clamp(12px, 2vw, 28px);
-  width: min(560px, 42vw); overflow-y: auto; overscroll-behavior: contain;
-  border: 1px solid var(--line); border-radius: 16px; background: var(--glass);
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); box-shadow: var(--shadow-float);
-  opacity: 0; translate: -24px 0; transition: opacity .4s var(--ease), translate .5s var(--ease);
+  position: absolute; inset: clamp(14px, 3vh, 36px) 0; margin: 0 auto; width: min(1180px, calc(100vw - 2 * clamp(14px, 3vw, 40px)));
+  overflow-y: auto; overscroll-behavior: contain;
+  border: 1px solid var(--line-strong); border-radius: 16px; background: color-mix(in oklab, var(--surface) 93%, transparent);
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: var(--shadow-float);
+  opacity: 0; scale: .97; transition: opacity .35s var(--ease), scale .5s var(--ease);
 }
-.scene.on .scene-panel { opacity: 1; translate: 0 0; transition-delay: .55s, .55s; }
-.scene-in { padding: 18px clamp(20px, 2.4vw, 32px) 32px; }
-.scene-top { position: sticky; top: -18px; z-index: 1; margin: -18px calc(-1 * clamp(20px, 2.4vw, 32px)) 8px; padding: 14px clamp(20px, 2.4vw, 32px) 10px; background: linear-gradient(var(--glass) 70%, transparent); }
+.scene.on .scene-panel { opacity: 1; scale: 1; transition-delay: .8s, .8s; }
+.scene-in { max-width: 980px; margin: 0 auto; padding: 22px clamp(20px, 4vw, 56px) 48px; }
+.scene-top { position: sticky; top: -22px; z-index: 1; margin: -22px calc(-1 * clamp(20px, 4vw, 56px)) 8px; padding: 18px clamp(20px, 4vw, 56px) 12px; background: linear-gradient(color-mix(in oklab, var(--surface) 96%, transparent) 70%, transparent); }
 .scene-back {
   appearance: none; display: inline-flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; cursor: pointer;
   font: inherit; font-size: 13px; color: var(--ink-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px;
@@ -441,7 +442,7 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 .scene-back:hover { color: var(--accent); border-color: var(--accent); }
 .scene-back kbd { font-family: var(--pixel); font-size: 10.5px; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); color: var(--ink-3); }
 .scene-n { margin: 14px 0 0; font-family: var(--pixel); font-size: clamp(56px, 6vw, 88px); line-height: .9; color: var(--accent); }
-.scene-title { margin: 6px 0 26px; font-weight: 400; font-size: clamp(36px, 3.6vw, 52px); line-height: 1; letter-spacing: -.04em; }
+.scene-title { margin: 6px 0 32px; font-weight: 400; font-size: clamp(40px, 5vw, 72px); line-height: 1; letter-spacing: -.04em; }
 .scene-next { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--line); }
 .scene-next button {
   appearance: none; cursor: pointer; font-family: var(--pixel); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase;
@@ -449,14 +450,15 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 }
 .scene-next button:hover { color: var(--accent); border-color: var(--accent); }
 
-/* content inside the narrower panel */
-.scene .edu-cols, .scene .edu-courses ul, .scene .extras { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+/* the panel narrows on phones, so the long rows stack there */
+@media (max-width: 900px) {
+  .scene .edu-cols, .scene .edu-courses ul, .scene .extras { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .scene .wk-row { grid-template-columns: 2.2em minmax(0, 1fr) 1.2em; gap: 4px 12px; padding: 14px 2px; }
+  .scene .wk-t { font-size: clamp(22px, 6vw, 28px); }
+  .scene .wk-tags { grid-column: 2; grid-row: 2; text-align: left; font-size: 11.5px; }
+  .scene .wk-go { grid-column: 3; grid-row: 1; }
+}
 .scene .edu-row + .edu-row { margin-top: 8px; }
-.scene .wk-row { grid-template-columns: 2.2em minmax(0, 1fr) 1.2em; gap: 4px 12px; padding: 14px 2px; }
-.scene .wk-t { font-size: clamp(22px, 2vw, 28px); }
-.scene .wk-tags { grid-column: 2; grid-row: 2; text-align: left; font-size: 11.5px; }
-.scene .wk-go { grid-column: 3; grid-row: 1; }
-.scene .link-list summary { font-size: clamp(20px, 1.8vw, 24px); }
 .wk-follow { z-index: 30; }
 .col-label, .sub-label, .w-meta, .wk-n { font-family: var(--pixel); letter-spacing: .08em; }
 
@@ -466,7 +468,9 @@ html.in-scene, html.in-scene body { overflow: hidden; }
   .campus-tag { height: 22px; font-size: 9.5px; padding: 0 6px; gap: 4px; }
   .hero-copy { width: auto; }
   .scene-shade { background: linear-gradient(0deg, var(--bg) 0%, color-mix(in oklab, var(--bg) 80%, transparent) 52%, transparent 62%); }
-  .scene-panel { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; height: 56svh; translate: 0 24px; }
+  .scene.on .scene-shade { transition-delay: .25s; }
+  .scene-panel { inset: auto 8px 8px; width: auto; height: 56svh; }
+  .scene.on .scene-panel { transition-delay: .55s, .55s; }
 }
 @media (prefers-reduced-motion: reduce) {
   .campus-cam, .scene-panel, .scene-shade, .hero-copy { transition: none !important; }
@@ -548,6 +552,7 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 
 /* >> in the corner of an answer, like the hello box's Next */
 .bubble-answer { padding-bottom: 30px; }
+.bubble-answer .bubble-q { padding-right: 22px; }
 .bubble-ff {
   position: absolute; right: 8px; bottom: 4px; appearance: none; background: none; border: 0; padding: 2px 4px; cursor: pointer;
   font-family: var(--pixel) !important; font-size: 18px !important; line-height: 1; color: var(--ink-3) !important;

@@ -83,6 +83,9 @@ export function AskMe({ onGo, onReplay, hidden }: Props) {
 
         {mode.kind === 'answer' && faq && (
           <>
+            <button type="button" className="bubble-x" onClick={() => setMode({ kind: 'prompt' })} aria-label="Close">
+              ×
+            </button>
             <p className="bubble-q">{faq.q}</p>
             <p className="bubble-a" onClick={finish}>
               <span aria-hidden="true">{shown}</span>
