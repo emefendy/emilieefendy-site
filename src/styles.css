@@ -427,7 +427,6 @@ html.in-scene, html.in-scene body { overflow: hidden; }
   font: inherit; font-size: 13px; color: var(--ink-2); background: none; border: 1px solid var(--line-strong); border-radius: 999px;
 }
 .scene-back:hover { color: var(--accent); border-color: var(--accent); }
-.scene-back kbd { font-family: var(--pixel); font-size: 10.5px; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); color: var(--ink-3); }
 .scene-n { margin: 14px 0 0; font-family: var(--pixel); font-size: clamp(56px, 6vw, 88px); line-height: .9; color: var(--accent); }
 .scene-title { margin: 6px 0 32px; font-weight: 400; font-size: clamp(40px, 5vw, 72px); line-height: 1; letter-spacing: -.04em; }
 .scene-next { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--line); }
@@ -565,3 +564,8 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 .wk-badge img { max-width: 100%; max-height: 100%; object-fit: contain; }
 .wk-badge-mono { background: var(--surface-2); color: var(--accent); font-family: var(--pixel); font-size: 18px; letter-spacing: .04em; }
 .wk li.on .wk-badge, .wk-row:focus-visible .wk-badge { border-color: var(--accent); transform: translateX(6px); }
+
+.scene .edu-main { font-size: clamp(32px, 3.4vw, 44px); letter-spacing: -.03em; margin-bottom: 8px; }
+.scene-back { padding: 6px 14px 6px 12px; }
+/* the closed bubble hugs its line instead of stretching across */
+.bubble-prompt { flex: 0 1 auto; padding: 10px 14px; }

@@ -47,7 +47,7 @@ export function Scene({ scene, onClose, onSwitch, openXp, onToggleXp, onOpenWork
           <div className="scene-in" key={s.id}>
             <div className="scene-top">
               <button type="button" className="scene-back" ref={back} onClick={onClose}>
-                <span aria-hidden="true">←</span> Back to campus <kbd>esc</kbd>
+                <span aria-hidden="true">←</span> Back to campus
               </button>
             </div>
             <p className="scene-n">{String(i + 1).padStart(2, '0')}</p>
@@ -82,7 +82,7 @@ function Education() {
       <div className="edu">
         <div className="edu-row">
           <div>
-            <p className="edu-school">Harvard University</p>
+            <p className="edu-school edu-main">Harvard University</p>
             <p className="edu-deg">A.B. in Computer Science &amp; Physics, concurrent S.M. in Computer Science</p>
             <p className="edu-note">Cambridge, MA</p>
             <div className="edu-cols">
