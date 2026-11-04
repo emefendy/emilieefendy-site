@@ -570,3 +570,11 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 .scene-back { padding: 6px 14px 6px 12px; }
 /* the closed bubble hugs its line instead of stretching across */
 .bubble-prompt { flex: 0 1 auto; padding: 10px 14px; }
+
+/* contact links sit in the bottom-left corner, out of the way of the bubble */
+@media (min-width: 901px) {
+  .hero { padding-bottom: calc(clamp(24px, 5vh, 48px) + 56px); }
+  .hero > .links { position: absolute; z-index: 3; left: clamp(20px, 5vw, 64px); bottom: clamp(24px, 5vh, 48px); transition: opacity .45s var(--ease); }
+  .hero.away > .links { opacity: 0; pointer-events: none; }
+}
+@media (max-width: 900px) { .hero > .links { margin-top: 4px; } }

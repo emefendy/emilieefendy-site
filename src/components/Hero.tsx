@@ -13,28 +13,28 @@ export function Hero({ focus, onOpen, onReplay, reduced }: HeroProps) {
         <p className="hero-eyebrow">CS &amp; Physics · Harvard</p>
         <h1 className="hero-h">Emilie Efendy</h1>
         <AskMe onGo={onOpen} onReplay={onReplay} />
-        <ul className="links">
-          <li>
-            <a href={'mailto:' + EMAIL}>
-              <MailIcon />
-              {EMAIL}
-            </a>
-          </li>
-          <li>
-            <a href={SOCIALS.github} target="_blank" rel="noopener">
-              <GithubIcon />
-              github
-            </a>
-          </li>
-          <li>
-            <a href={SOCIALS.linkedin} target="_blank" rel="noopener">
-              <LinkedinIcon />
-              linkedin
-            </a>
-          </li>
-        </ul>
       </div>
       <CampusScene focus={focus} onOpen={onOpen} reduced={reduced} />
+      <ul className="links">
+        <li>
+          <a href={'mailto:' + EMAIL}>
+            <MailIcon />
+            {EMAIL}
+          </a>
+        </li>
+        <li>
+          <a href={SOCIALS.github} target="_blank" rel="noopener">
+            <GithubIcon />
+            github
+          </a>
+        </li>
+        <li>
+          <a href={SOCIALS.linkedin} target="_blank" rel="noopener">
+            <LinkedinIcon />
+            linkedin
+          </a>
+        </li>
+      </ul>
     </main>
   );
 }
