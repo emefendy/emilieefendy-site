@@ -47,6 +47,7 @@ export function CaseStudy({ slug, onClose, onNavigate, onOpenSlides }: Props) {
   const i = WORKS.findIndex((w) => w.slug === shown);
   const w = WORKS[i];
   const next = WORKS[(i + 1) % WORKS.length]!;
+  const prev = WORKS[(i - 1 + WORKS.length) % WORKS.length]!;
 
   return (
     <dialog
@@ -112,11 +113,18 @@ export function CaseStudy({ slug, onClose, onNavigate, onOpenSlides }: Props) {
             {w.media && <CaseMedia media={w.media} onOpenSlides={onOpenSlides} />}
           </article>
 
-          <button type="button" className="cs-next" onClick={() => onNavigate(next.slug)} data-cursor="next">
-            <span className="cs-next-l">next</span>
-            <span className="cs-next-t">{next.title}</span>
-            <span aria-hidden="true">→</span>
-          </button>
+          <nav className="cs-pn" aria-label="Other projects">
+            <button type="button" className="cs-next cs-prev" onClick={() => onNavigate(prev.slug)}>
+              <span aria-hidden="true">←</span>
+              <span className="cs-next-l">previous</span>
+              <span className="cs-next-t">{prev.title}</span>
+            </button>
+            <button type="button" className="cs-next" onClick={() => onNavigate(next.slug)}>
+              <span className="cs-next-l">next</span>
+              <span className="cs-next-t">{next.title}</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </nav>
         </div>
       )}
     </dialog>

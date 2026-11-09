@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { EXPERIENCE, SCENES, type SceneId, type Slide } from './content';
+import { SCENES, type SceneId, type Slide } from './content';
 import { useTheme } from './hooks/useTheme';
 import { useHotkeys } from './hooks/useHotkeys';
 import { reducedMotion } from './lib/motion';
@@ -33,7 +33,7 @@ export function App() {
   const [reduced] = useState(reducedMotion);
   const [scene, setScene] = useState<SceneId | null>(sceneFromHash);
   const [work, setWork] = useState<string | null>(null);
-  const [openXp, setOpenXp] = useState<ReadonlySet<string>>(() => new Set([EXPERIENCE[0]!.org]));
+  const [openXp, setOpenXp] = useState<ReadonlySet<string>>(() => new Set());
   const [slides, setSlides] = useState<LightboxState>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [toast, setToast] = useState<{ msg: string; id: number } | null>(null);
