@@ -550,6 +550,9 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 .bubble-ff.ready { color: var(--accent) !important; animation: nudge .9s steps(2) infinite; }
 .bubble-ff:hover { color: var(--ink) !important; }
 @media (prefers-reduced-motion: reduce) { .bubble-ff.ready { animation: none; } }
+.hello-say { position: relative; }
+.hello-say .hello-text { padding-right: 26px; }
+.hello-ff { right: -4px; bottom: -2px; }
 
 /* poked: a startled little hop */
 .poked .pxme { animation: hop .38s cubic-bezier(.3, 1.6, .5, 1); }
