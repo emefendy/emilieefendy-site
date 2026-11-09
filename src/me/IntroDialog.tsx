@@ -75,12 +75,26 @@ export function IntroDialog({ open, onDone }: Props) {
           <PixelMe mood={!open ? 'idle' : poked ? 'surprised' : mood} height={200} />
         </div>
         <p className="hello-name">Emilie</p>
-        <p className="hello-text">
-          <span aria-hidden="true">{shown}</span>
-          <span className="sr-only" aria-live="polite">
-            {text}
-          </span>
-        </p>
+        <div className="hello-say">
+          <p className="hello-text">
+            <span aria-hidden="true">{shown}</span>
+            <span className="sr-only" aria-live="polite">
+              {text}
+            </span>
+          </p>
+          {/* >> like the one in the Ask me bubble: finish the line, then on to the next box */}
+          <button
+            type="button"
+            className={'bubble-ff hello-ff' + (done ? ' ready' : '')}
+            onClick={(e) => {
+              e.stopPropagation();
+              advance();
+            }}
+            aria-label={done ? (last ? 'Close' : 'Next box') : 'Skip to the end'}
+          >
+            »
+          </button>
+        </div>
         <div className="hello-foot">
           <span className="hello-dots" aria-label={`${page + 1} of ${INTRO.length}`}>
             {INTRO.map((_, i) => (
