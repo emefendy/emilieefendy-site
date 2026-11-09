@@ -14,7 +14,7 @@ export const SCENES: readonly { id: SceneId; label: string; title: string }[] = 
   { id: 'education', label: 'Education', title: 'Education' },
   { id: 'experience', label: 'Experience', title: 'Experience' },
   { id: 'projects', label: 'Projects', title: 'Projects' },
-  { id: 'extras', label: 'Extras', title: 'Extras' },
+  { id: 'extras', label: 'Awards', title: 'Awards' },
 ];
 
 export type Experience = {
@@ -64,8 +64,7 @@ export const EXPERIENCE: Experience[] = [
     meta: 'San Francisco, CA · May 2026 – Jun 2026',
     desc: [
       'Helped organize 100+ domain experts and ran internal trainings on eval design and trajectory analysis. Raised the share of submissions passing benchmarks set by frontier AI lab clients from 41% to 85%.',
-      'Off the clock, I joined the data team to help program and debug Contigo Data Explorer, which simulates an entire company’s workflow so AI agents have a realistic world to work in.',
-      'Some of it reads from static JSON files and some queries Postgres through Supabase. The whole thing is plain JavaScript on Cloudflare Pages, which caps each file at 25 MiB, so we split the biggest exports into smaller chunks.',
+      'Off the clock, I joined the data team to help build and debug a simulated enterprise environment, a full company’s workflow recreated so AI agents have a realistic world to operate in.',
     ],
     stack: ['Evals', 'Operations', 'JavaScript', 'Supabase', 'Cloudflare Pages'],
   },
