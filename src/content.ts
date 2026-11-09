@@ -64,20 +64,10 @@ export const EXPERIENCE: Experience[] = [
     meta: 'San Francisco, CA · May 2026 – Jun 2026',
     desc: [
       'Helped organize 100+ domain experts and ran internal trainings on eval design and trajectory analysis. Raised the share of submissions passing benchmarks set by frontier AI lab clients from 41% to 85%.',
-      'Off the clock, I joined the data team to help program and debug Contigo Data Explorer, a browser-based simulation of a company’s whole corporate workflow. It brings exported data from Zoho CRM, Confluence, MS Teams, Jira, Gmail, Google Drive and a campaign database into one place to explore: pipelines and deals, page trees, chats, sprints and backlogs, mailboxes and files.',
-      'Static JSON viewers sit alongside Supabase-backed views over Postgres, all in vanilla JavaScript on Cloudflare Pages, with large exports pre-chunked to stay under its 25 MiB per-file limit.',
+      'Off the clock, I joined the data team to help program and debug Contigo Data Explorer, which simulates an entire company’s workflow so AI agents have a realistic world to work in.',
+      'Some of it reads from static JSON files and some queries Postgres through Supabase. The whole thing is plain JavaScript on Cloudflare Pages, which caps each file at 25 MiB, so we split the biggest exports into smaller chunks.',
     ],
     stack: ['Evals', 'Operations', 'JavaScript', 'Supabase', 'Cloudflare Pages'],
-  },
-  {
-    org: 'Katmai Computing',
-    role: 'Go-to-Market Intern',
-    meta: 'Palo Alto, CA · Harvard Innovation Labs startup · Jun 2025 – Aug 2025',
-    desc: [
-      'Built the CRM for the seed fundraising sprint, tracking 100+ CEOs, investors and funds including Sequoia, a16z and 8VC, and researched the funding rounds and lead investors of 200+ startups. Independently secured an investor call with Quantonation, a global VC firm focused on quantum technologies, and managed the first cohort of clients.',
-      'On the research team, developed software modules that connect quantum hardware readings to user-interface components.',
-    ],
-    stack: ['Fundraising', 'Go-to-market', 'CRM', 'Software'],
   },
   {
     org: 'NC State Department of Computer Science',
@@ -519,7 +509,7 @@ export const FAQ: readonly Faq[] = [
   },
   {
     q: 'Where have you worked?',
-    a: 'Most recently QuEra Quantum Computing, building a data pipeline and training agents against custom evals. Before that Mercor, Katmai Computing, NC State and Rice’s quantum initiative.',
+    a: 'Most recently QuEra Quantum Computing, building a data pipeline and training agents against custom evals. Before that Mercor, NC State and Rice’s quantum initiative.',
     go: 'experience',
   },
   {
@@ -528,14 +518,13 @@ export const FAQ: readonly Faq[] = [
       'At Harvard:',
       '• Harvard Tech for Social Good: I lead two cohorts and teach weekly lectures',
       '• HackHarvard: finance & corporate relations',
-      '• Women in Computer Science: Director of Programming for WECode',
       '• Society of Physics Students, Innovation Labs, and Women in Entrepreneurship',
     ].join('\n'),
     go: 'education',
   },
   {
     q: 'What do you do for fun?',
-    a: 'I love to run, and I’m currently training for a half marathon! I also love experimenting in the dining hall to see what new recipes I can come up with.',
+    a: 'I love to run, and I’m currently training for a half marathon! I also love experimenting in the dining hall to see what new recipes I can come up with. I’ve also won some state and national competitions for cello.',
     go: 'extras',
   },
   {
