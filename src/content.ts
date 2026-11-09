@@ -52,8 +52,8 @@ export const EXPERIENCE: Experience[] = [
           slides: deck('quera', 35, (i) => `QuEra Integrated Photonics Platform · ${i} of 35`, (i) => `QuEra final presentation slide ${i} of 35`),
         },
         {
-          label: 'AI workshop · 23 slides',
-          slides: deck('ai-workshop', 23, (i) => `AI Workshop · ${i} of 23`, (i) => `AI workshop slide ${i} of 23`),
+          label: 'AI workshop · 25 slides',
+          slides: deck('ai-workshop', 25, (i) => `The Big Things in AI Right Now · ${i} of 25`, (i) => `AI workshop slide ${i} of 25`),
         },
       ],
     },
@@ -101,16 +101,17 @@ export const EXPERIENCE: Experience[] = [
 ];
 
 export const HARVARD_COURSES = [
-  'Theoretical Physics (Course/Teaching Assistant)',
-  'Machine Learning',
-  'Reinforcement Learning',
-  'Quantum Mechanics',
+  'Theoretical Physics (Teaching Assistant)',
   'Systems Programming & Machine Organization',
+  'Reinforcement Learning',
+  'Machine Learning (MIT)',
   'Data Structures & Algorithms',
   'Algorithms & Limitations',
-  'Real Analysis',
+  'AI Agents & Multi-Agent Systems',
+  'Quantum Mechanics',
   'Proof-based Linear Algebra & Vector Calculus',
   'Probability',
+  'Statistical Inference',
   'Game Theory for Social Behavior',
   'Evolving Morality: From Primordial Soup to Superintelligent Machines',
 ];
@@ -174,7 +175,7 @@ const ALSF_SCREENS = ['Fundraisers near you', 'Personal fundraising page', 'Quic
 export const WORKS: Work[] = [
   {
     slug: 'chw-central',
-    tags: 'RAG · WordPress · Lead engineer',
+    tags: 'Senior SWE · RAG · WordPress',
     cover: { src: 'logos/chw-central.png', kind: 'logo' },
     title: 'Central Healthcare Workers',
     nonprofit: true,
@@ -204,7 +205,7 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'computers-4-people',
-    tags: 'Electron · Next.js · Computer use',
+    tags: 'SWE · Electron · Next.js · Computer use',
     cover: { src: 'logos/computers-4-people.png', kind: 'logo' },
     title: 'Computers 4 People',
     nonprofit: true,
@@ -232,7 +233,7 @@ export const WORKS: Work[] = [
   },
   {
     slug: '412-food-rescue',
-    tags: 'i18n · 3 languages',
+    tags: 'SWE · i18n · 3 languages',
     cover: { src: 'logos/412-food-rescue.png', kind: 'logo' },
     title: '412 Food Rescue',
     nonprofit: true,
@@ -258,7 +259,7 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'steel-city-codes',
-    tags: 'Director · Hackathons',
+    tags: 'Executive Director of Events · Hackathons',
     cover: { src: 'previews/scc.jpg', kind: 'shot' },
     title: 'Steel City Codes',
     nonprofit: true,
@@ -291,7 +292,7 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'alsf',
-    tags: 'UX · Figma',
+    tags: 'Project Lead · UX · Figma',
     cover: { src: 'decks/alsf/01.jpg', kind: 'shot' },
     title: 'Alex’s Lemonade Stand Foundation',
     nonprofit: true,
@@ -334,7 +335,7 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'first-racquet',
-    tags: 'UX · iOS',
+    tags: 'Project Lead · UX · iOS',
     cover: { src: 'decks/first-racquet/02.jpg', kind: 'shot' },
     title: 'First Racquet',
     nonprofit: true,
@@ -370,7 +371,7 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'breakthrough',
-    tags: 'Physics · Global finalist',
+    tags: 'Researcher · Physics · Global finalist',
     cover: { src: 'previews/bjc.jpg', kind: 'shot' },
     title: 'Breakthrough Junior Challenge',
     when: 'Global Physics Finalist, 1 of 5 ($400K grand prize)',
@@ -398,7 +399,7 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'evergreen',
-    tags: 'SwiftUI · Pitch',
+    tags: 'iOS Developer · SwiftUI · Pitch',
     cover: { src: 'decks/evergreen/01.jpg', kind: 'shot' },
     title: 'For Evergreen',
     when: 'Pitched @ Technovation Houston · 2024',
@@ -424,7 +425,7 @@ export const WORKS: Work[] = [
   },
   {
     slug: 'wecode',
-    tags: 'Programming · Conference',
+    tags: 'Executive Director of Programming · Conference',
     cover: { src: 'previews/wecode.jpg', kind: 'shot' },
     title: 'Harvard WECode x Build@HUB Vietnam',
     when: 'Director of Programming · Harvard WECode',
