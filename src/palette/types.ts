@@ -1,4 +1,4 @@
-export const GROUPS = ['Recent', 'Sections', 'Works', 'Experience', 'Actions', 'Elsewhere'] as const;
+export const GROUPS = ['Recent', 'Sections', 'Works', 'Internships', 'Actions', 'Elsewhere'] as const;
 export type Group = (typeof GROUPS)[number];
 
 export type Command = {

@@ -166,12 +166,9 @@ function Experience({
               <span className="xr-main">
                 <span className="xr-name">
                   <span className="t">{x.org}</span>
-                  <span className="xr-at">{shortPlace(place(x.meta))}</span>
+                  <span className="xr-at">{place(x.meta)}</span>
                 </span>
                 <span className="xr-role">{x.role}</span>
-              </span>
-              <span className="xr-when">
-                {when(x.meta)}
               </span>
             </summary>
             <div className="w-body">
@@ -243,17 +240,9 @@ function Extras() {
 
 // meta reads "Place · Mon YYYY – Mon YYYY · anything else"
 const parts = (meta: string) => meta.split(' · ');
-const when = (meta: string) => parts(meta).find((p) => /\d{4}/.test(p)) ?? '';
 const place = (meta: string) => parts(meta)[0] ?? '';
 const extra = (meta: string) =>
   parts(meta)
     .slice(1)
     .filter((p) => !/\d{4}/.test(p))
     .join(' · ');
-// the city next to each name: short, the way I'd say it
-const SHORT: Record<string, string> = {
-  'San Francisco, CA': 'SF',
-  'Raleigh, NC': 'Raleigh',
-  'Houston, TX': 'Houston',
-};
-const shortPlace = (p: string) => SHORT[p] ?? p;

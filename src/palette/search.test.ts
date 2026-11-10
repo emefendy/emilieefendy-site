@@ -7,7 +7,7 @@ const cmds: Command[] = [
   { id: 'go:past', title: 'Go to the past', group: 'Sections', run: noop },
   { id: 'w:chw', title: 'Central Healthcare Workers', group: 'Works', keywords: 'rag semantic search wordpress', run: noop },
   { id: 'w:evergreen', title: 'For Evergreen', group: 'Works', keywords: 'swiftui ios climate', run: noop },
-  { id: 'x:mercor', title: 'Mercor', group: 'Experience', hint: 'Project Manager', keywords: 'evals react', run: noop },
+  { id: 'x:mercor', title: 'Mercor', group: 'Internships', hint: 'Project Manager', keywords: 'evals react', run: noop },
   { id: 'a:theme', title: 'Switch to dark mode', group: 'Actions', run: noop },
 ];
 
@@ -15,7 +15,7 @@ const titles = (q: string, recent: string[] = []) => search(cmds, q, recent).map
 
 describe('search', () => {
   it('lists everything grouped when the query is empty', () => {
-    expect(search(cmds, '').map((r) => r.group)).toEqual(['Sections', 'Works', 'Works', 'Experience', 'Actions']);
+    expect(search(cmds, '').map((r) => r.group)).toEqual(['Sections', 'Works', 'Works', 'Internships', 'Actions']);
   });
 
   it('puts recents first without dropping them from their own group', () => {
@@ -41,7 +41,7 @@ describe('search', () => {
   });
 
   it('drops scattered matches and short keyword prefixes', () => {
-    const extra: Command = { id: 'x:ncsu', title: 'NC State Department of Computer Science', group: 'Experience', keywords: 'french', run: noop };
+    const extra: Command = { id: 'x:ncsu', title: 'NC State Department of Computer Science', group: 'Internships', keywords: 'french', run: noop };
     expect(search([...cmds, extra], 'fr').map((r) => r.command.id)).toEqual(['w:evergreen']);
   });
 
