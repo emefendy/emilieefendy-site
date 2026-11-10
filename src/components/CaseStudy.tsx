@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { WORKS, type Media, type Slide } from '../content';
-import { SplitText } from './Reveal';
+import { PROJECTS, type Media, type Slide } from '../content';
+import { cx } from '../lib/cx';
+import { ordinal } from '../lib/format';
+import { SlideStrip } from './SlideStrip';
+import { SplitText } from './SplitText';
 
 type Props = {
   slug: string | null;
@@ -12,9 +15,8 @@ type Props = {
 const LEAVE_MS = 380;
 
 /**
- * Full-screen write-up for one project. It's a real <dialog>, so focus is
- * trapped and Escape works for free; the only custom part is holding the
- * last project on screen long enough to animate it out.
+ * A project write-up in a native <dialog> (focus trapping and Escape for
+ * free). On close it keeps the last project mounted until the exit animation ends.
  */
 export function CaseStudy({ slug, onClose, onNavigate, onOpenSlides }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -28,9 +30,7 @@ export function CaseStudy({ slug, onClose, onNavigate, onOpenSlides }: Props) {
     if (slug) {
       setShown(slug);
       setLeaving(false);
-      if (!d.open) {
-        d.showModal();
-      }
+      if (!d.open) d.showModal();
       scroller.current?.scrollTo({ top: 0 });
       return;
     }
@@ -44,41 +44,45 @@ export function CaseStudy({ slug, onClose, onNavigate, onOpenSlides }: Props) {
     return () => clearTimeout(id);
   }, [slug]);
 
-  const i = WORKS.findIndex((w) => w.slug === shown);
-  const w = WORKS[i];
-  const next = WORKS[(i + 1) % WORKS.length]!;
-  const prev = WORKS[(i - 1 + WORKS.length) % WORKS.length]!;
+  const i = PROJECTS.findIndex((p) => p.slug === shown);
+  const project = PROJECTS[i];
+  const next = PROJECTS[(i + 1) % PROJECTS.length]!;
+  const prev = PROJECTS[(i - 1 + PROJECTS.length) % PROJECTS.length]!;
 
   return (
     <dialog
       ref={ref}
-      className={'cs' + (leaving ? ' leaving' : '')}
+      className={cx('cs', leaving && 'leaving')}
       aria-labelledby="cs-title"
       onCancel={(e) => {
         e.preventDefault();
         onClose();
       }}
     >
-      {w && (
+      {project && (
         <div className="cs-scroll" ref={scroller}>
           <header className="cs-bar">
             <span className="cs-count">
-              {String(i + 1).padStart(2, '0')} / {String(WORKS.length).padStart(2, '0')}
+              {ordinal(i)} / {String(PROJECTS.length).padStart(2, '0')}
             </span>
-            <button type="button" className="cs-close" onClick={onClose} data-cursor="close" autoFocus>
+            <button type="button" className="cs-close" onClick={onClose}>
               close <kbd>esc</kbd>
             </button>
           </header>
 
-          <article className="cs-body" key={w.slug}>
-            <p className="cs-tags">{w.tags}</p>
-            <SplitText as="h2" id="cs-title" text={w.title} className="cs-title" delay={120} />
-            {w.nonprofit && <p className="cs-npo"><span className="npo">501(c)(3)</span></p>}
-            {w.when && <p className="when">{w.when}</p>}
+          <article className="cs-body" key={project.slug}>
+            <p className="cs-tags">{project.tags}</p>
+            <SplitText as="h2" id="cs-title" text={project.title} className="cs-title" delay={120} />
+            {project.nonprofit && (
+              <p className="cs-npo">
+                <span className="npo">501(c)(3)</span>
+              </p>
+            )}
+            {project.when && <p className="when">{project.when}</p>}
 
             <div className="cs-grid">
               <div className="cs-text">
-                {w.body.map((b, k) =>
+                {project.body.map((b, k) =>
                   b.kind === 'p' ? (
                     <p className="x" key={k}>
                       {b.text}
@@ -91,9 +95,9 @@ export function CaseStudy({ slug, onClose, onNavigate, onOpenSlides }: Props) {
                     </ul>
                   ),
                 )}
-                {w.links.length > 0 && (
+                {project.links.length > 0 && (
                   <p className="w-links">
-                    {w.links.map((l) => (
+                    {project.links.map((l) => (
                       <a key={l.href} href={l.href} target="_blank" rel="noopener">
                         → {l.label}
                       </a>
@@ -102,15 +106,15 @@ export function CaseStudy({ slug, onClose, onNavigate, onOpenSlides }: Props) {
                 )}
               </div>
               <aside className="cs-side">
-                {w.logo && (
+                {project.logo && (
                   <div className="logo-card">
-                    <img src={w.logo.src} alt={w.logo.alt} />
+                    <img src={project.logo.src} alt={project.logo.alt} />
                   </div>
                 )}
               </aside>
             </div>
 
-            {w.media && <CaseMedia media={w.media} onOpenSlides={onOpenSlides} />}
+            {project.media && <CaseMedia media={project.media} onOpenSlides={onOpenSlides} />}
           </article>
 
           <nav className="cs-pn" aria-label="Other projects">
@@ -134,7 +138,7 @@ export function CaseStudy({ slug, onClose, onNavigate, onOpenSlides }: Props) {
 function CaseMedia({ media, onOpenSlides }: { media: Media; onOpenSlides: Props['onOpenSlides'] }) {
   if (media.kind === 'preview') {
     return (
-      <a className="preview-card cs-preview" href={media.href} target="_blank" rel="noopener" data-cursor="visit">
+      <a className="preview-card cs-preview" href={media.href} target="_blank" rel="noopener">
         <img src={media.src} alt={media.alt} width={media.width} height={media.height} />
         <span>
           <span>{media.host}</span>
@@ -143,23 +147,5 @@ function CaseMedia({ media, onOpenSlides }: { media: Media; onOpenSlides: Props[
       </a>
     );
   }
-  return (
-    <div className={'deck deck-' + media.layout}>
-      <p className="deck-label">{media.label}</p>
-      <div className="deck-strip">
-        {media.slides.map((s, k) => (
-          <button
-            key={s.full}
-            className="deck-thumb"
-            type="button"
-            aria-label={'Open ' + s.label}
-            data-cursor="view"
-            onClick={() => onOpenSlides(media.slides, k)}
-          >
-            <img src={s.thumb} alt="" loading="lazy" />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
+  return <SlideStrip deck={media} layout={media.layout} onOpen={onOpenSlides} />;
 }

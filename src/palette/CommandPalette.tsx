@@ -1,7 +1,8 @@
-import { useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import { useCallback, useId, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { highlight } from '../lib/fuzzy';
 import { EMAIL } from '../content';
+import { highlight } from '../lib/fuzzy';
+import { read, write } from '../lib/storage';
 import { search } from './search';
 import type { Command, Result } from './types';
 
@@ -10,20 +11,16 @@ const MAX_RECENT = 3;
 
 function loadRecent(): string[] {
   try {
-    const v: unknown = JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]');
-    return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
+    const saved: unknown = JSON.parse(read(RECENT_KEY) ?? '[]');
+    return Array.isArray(saved) ? saved.filter((id): id is string => typeof id === 'string') : [];
   } catch {
     return [];
   }
 }
 
 function saveRecent(id: string) {
-  try {
-    const next = [id, ...loadRecent().filter((x) => x !== id)].slice(0, MAX_RECENT);
-    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
-  } catch {
-    /* fine, no recents */
-  }
+  const next = [id, ...loadRecent().filter((x) => x !== id)].slice(0, MAX_RECENT);
+  write(RECENT_KEY, JSON.stringify(next));
 }
 
 type Props = { open: boolean; onClose: () => void; commands: readonly Command[] };
@@ -40,12 +37,13 @@ function Palette({ onClose, commands }: Omit<Props, 'open'>) {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const uid = useId();
-  const optionId = (i: number) => `${uid}-opt-${i}`;
+  const listId = `${uid}-list`;
+  const optionId = useCallback((i: number) => `${uid}-opt-${i}`, [uid]);
 
   const results = useMemo<Result[]>(() => {
     const found = search(commands, query, recent);
     if (found.length > 0 || !query.trim()) return found;
-    // nothing matched, so offer to just ask me
+    // no match: offer to email the question instead
     const q = query.trim();
     const ask: Command = {
       id: 'ask',
@@ -64,23 +62,25 @@ function Palette({ onClose, commands }: Omit<Props, 'open'>) {
   // Focus the input on open, hand focus back to whatever had it on close,
   // and stop the page behind from scrolling.
   useLayoutEffect(() => {
-    const prev = document.activeElement as HTMLElement | null;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const html = document.documentElement;
     const gutter = window.innerWidth - html.clientWidth;
     const { overflow, paddingRight } = html.style;
     html.style.overflow = 'hidden';
-    if (gutter > 0) html.style.paddingRight = gutter + 'px';
+    if (gutter > 0) html.style.paddingRight = `${gutter}px`;
     inputRef.current?.focus();
     return () => {
       html.style.overflow = overflow;
       html.style.paddingRight = paddingRight;
-      prev?.focus?.({ preventScroll: true });
+      previous?.focus({ preventScroll: true });
     };
   }, []);
 
   useLayoutEffect(() => {
-    listRef.current?.querySelector<HTMLElement>(`#${CSS.escape(optionId(active))}`)?.scrollIntoView({ block: 'nearest' });
-  }, [active]);
+    listRef.current
+      ?.querySelector<HTMLElement>(`#${CSS.escape(optionId(active))}`)
+      ?.scrollIntoView({ block: 'nearest' });
+  }, [active, optionId]);
 
   const run = (r: Result | undefined) => {
     if (!r) return;
@@ -103,15 +103,14 @@ function Palette({ onClose, commands }: Omit<Props, 'open'>) {
     else if (e.key === 'PageUp') move(-5);
     else if (e.key === 'Enter' && !e.nativeEvent.isComposing) run(results[active]);
     else if (e.key === 'Escape') {
-      // first escape clears, second one closes
+      // the first Escape clears the query, the second closes
       if (query) {
         setQuery('');
         setActive(0);
-      }
-      else onClose();
-    } else if (e.key === 'Tab') {
-      // nothing else in here takes focus
-    } else return;
+      } else onClose();
+    } else if (e.key !== 'Tab') {
+      return; // Tab is swallowed: the input is the only focusable thing in here
+    }
     e.preventDefault();
   };
 
@@ -132,7 +131,7 @@ function Palette({ onClose, commands }: Omit<Props, 'open'>) {
             placeholder="Search projects, jump to a section, or try “react”…"
             role="combobox"
             aria-expanded="true"
-            aria-controls={uid + '-list'}
+            aria-controls={listId}
             aria-activedescendant={results.length ? optionId(active) : undefined}
             aria-autocomplete="list"
             autoComplete="off"
@@ -145,7 +144,7 @@ function Palette({ onClose, commands }: Omit<Props, 'open'>) {
           </kbd>
         </div>
 
-        <div className="pal-list" id={uid + '-list'} role="listbox" ref={listRef} aria-label="Results">
+        <div className="pal-list" id={listId} role="listbox" ref={listRef} aria-label="Results">
           {nothing && <p className="pal-empty">Nothing on the site matches that.</p>}
           {results.map((r, i) => {
             const header = !searching && (i === 0 || results[i - 1]!.group !== r.group);

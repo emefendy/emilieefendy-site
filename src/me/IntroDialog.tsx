@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { INTRO } from '../content';
+import { useWindowEvent } from '../hooks/useWindowEvent';
+import { cx } from '../lib/cx';
 import { PixelMe, type Mood } from './PixelMe';
 import { usePoke } from './usePoke';
 import { useTypewriter } from './useTypewriter';
 
 type Props = { open: boolean; onDone: () => void };
 
-/**
- * The game-style hello on a first visit: pixel me in the middle of a dialog
- * box, waving, then talking through a few boxes of text with Next ▸.
- */
+/** The game-style hello on a first visit: a few boxes of text, one per Next. */
 export function IntroDialog({ open, onDone }: Props) {
   const [page, setPage] = useState(0);
   const next = useRef<HTMLButtonElement>(null);
@@ -32,26 +31,22 @@ export function IntroDialog({ open, onDone }: Props) {
     setPage((p) => p + 1);
   };
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onDone();
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        advance();
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  });
+  useWindowEvent(
+    'keydown',
+    (e) => {
+      if (e.key === 'Escape') onDone();
+      else if (e.key === 'ArrowRight') advance();
+      else return;
+      e.preventDefault();
+    },
+    open,
+  );
 
-  // wave hello on the first and last boxes, talk while the words come out, then rest
+  // wave on the first and last boxes, talk while the text types out
   const mood: Mood = page === 0 || (last && done) ? 'wave' : done ? 'idle' : 'talk';
 
   return (
-    <div className={'hello' + (open ? ' on' : '')} aria-hidden={!open} {...(!open ? { inert: '' } : {})}>
+    <div className={cx('hello', open && 'on')} aria-hidden={!open} inert={open ? undefined : ''}>
       <div className="hello-shade" />
       <div className="hello-box" role="dialog" aria-modal="true" aria-label="Hello from Emilie" onClick={advance}>
         <button
@@ -65,10 +60,9 @@ export function IntroDialog({ open, onDone }: Props) {
           Skip
         </button>
         <div
-          className={'hello-me' + (poked ? ' poked' : '')}
+          className={cx('hello-me', poked && 'poked')}
           onClick={(e) => {
-            // poking her isn't the same as clicking on to the next box
-            e.stopPropagation();
+            e.stopPropagation(); // a poke, not a click through to the next box
             poke();
           }}
         >
@@ -82,10 +76,9 @@ export function IntroDialog({ open, onDone }: Props) {
               {text}
             </span>
           </p>
-          {/* >> like the one in the Ask me bubble: finish the line, then on to the next box */}
           <button
             type="button"
-            className={'bubble-ff hello-ff' + (done ? ' ready' : '')}
+            className={cx('bubble-ff', 'hello-ff', done && 'ready')}
             onClick={(e) => {
               e.stopPropagation();
               advance();
@@ -104,7 +97,7 @@ export function IntroDialog({ open, onDone }: Props) {
           <button
             type="button"
             ref={next}
-            className={'hello-next' + (done ? ' ready' : '')}
+            className={cx('hello-next', done && 'ready')}
             onClick={(e) => {
               e.stopPropagation();
               advance();

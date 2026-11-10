@@ -1,5 +1,16 @@
-import { EMAIL, EXPERIENCE, SCENES, SOCIALS, WORKS, type SceneId, type Slide } from '../content';
+import {
+  EMAIL,
+  INTERNSHIPS,
+  PROJECTS,
+  REPO,
+  SCENES,
+  SOCIALS,
+  type Project,
+  type SceneId,
+  type Slide,
+} from '../content';
 import { copyText } from '../lib/clipboard';
+import { ordinal } from '../lib/format';
 import { slugify } from '../lib/slug';
 import type { Theme } from '../hooks/useTheme';
 import type { Command } from './types';
@@ -8,25 +19,22 @@ type Deps = {
   theme: Theme;
   toggleTheme: () => void;
   openScene: (scene: SceneId) => void;
-  openWork: (slug: string) => void;
-  openExperience: (org: string) => void;
+  openProject: (slug: string) => void;
+  showInternship: (org: string) => void;
   openSlides: (slides: Slide[], index: number) => void;
   toast: (msg: string) => void;
   goHome: () => void;
   replayIntro: () => void;
 };
 
-const REPO = 'https://github.com/emefendy/emilieefendy-site';
-
-const blurb = (w: (typeof WORKS)[number]) =>
-  w.body.map((b) => (b.kind === 'p' ? b.text : b.items.join(' '))).join(' ');
+const fullText = (p: Project) => p.body.map((b) => (b.kind === 'p' ? b.text : b.items.join(' '))).join(' ');
 
 export function buildCommands(d: Deps): Command[] {
   const sections: Command[] = [
     ...SCENES.map((s, i) => ({
-      id: 'go:' + s.id,
+      id: `go:${s.id}`,
       title: `Walk into ${s.label}`,
-      hint: String(i + 1).padStart(2, '0'),
+      hint: ordinal(i),
       keywords: 'building section open',
       group: 'Sections' as const,
       run: () => d.openScene(s.id),
@@ -40,35 +48,35 @@ export function buildCommands(d: Deps): Command[] {
     },
   ];
 
-  const works: Command[] = WORKS.map((w) => ({
-    id: 'work:' + w.slug,
-    title: w.title,
-    hint: w.when ?? (w.nonprofit ? '501(c)(3)' : ''),
-    keywords: [w.keywords, blurb(w)].join(' '),
-    group: 'Works',
-    run: () => d.openWork(w.slug),
+  const projects: Command[] = PROJECTS.map((p) => ({
+    id: `project:${p.slug}`,
+    title: p.title,
+    hint: p.when ?? (p.nonprofit ? '501(c)(3)' : ''),
+    keywords: [p.keywords, fullText(p)].join(' '),
+    group: 'Projects',
+    run: () => d.openProject(p.slug),
   }));
 
-  const decks: Command[] = WORKS.flatMap((w) => {
-    const m = w.media;
-    if (m?.kind !== 'deck') return [];
+  const decks: Command[] = PROJECTS.flatMap((p) => {
+    const media = p.media;
+    if (media?.kind !== 'deck') return [];
     return {
-      id: 'slides:' + w.slug,
-      title: `Flip through ${w.title} slides`,
-      hint: m.label,
+      id: `slides:${p.slug}`,
+      title: `Flip through ${p.title} slides`,
+      hint: media.label,
       keywords: 'deck figma design pitch',
-      group: 'Works',
-      run: () => d.openSlides(m.slides, 0),
+      group: 'Projects',
+      run: () => d.openSlides(media.slides, 0),
     };
   });
 
-  const experience: Command[] = EXPERIENCE.map((x) => ({
-    id: 'xp:' + slugify(x.org),
-    title: x.org,
-    hint: x.role,
-    keywords: [x.meta, x.stack.join(' '), x.desc.join(' ')].join(' '),
+  const internships: Command[] = INTERNSHIPS.map((job) => ({
+    id: `internship:${slugify(job.org)}`,
+    title: job.org,
+    hint: job.role,
+    keywords: [job.meta, job.stack.join(' '), job.desc.join(' ')].join(' '),
     group: 'Internships',
-    run: () => d.openExperience(x.org),
+    run: () => d.showInternship(job.org),
   }));
 
   const actions: Command[] = [
@@ -93,7 +101,9 @@ export function buildCommands(d: Deps): Command[] {
       hint: EMAIL,
       keywords: 'contact clipboard',
       group: 'Actions',
-      run: async () => d.toast((await copyText(EMAIL)) ? 'Copied ' + EMAIL : 'Couldn’t reach the clipboard'),
+      run: () => {
+        void copyText(EMAIL).then((ok) => d.toast(ok ? `Copied ${EMAIL}` : 'Couldn’t reach the clipboard'));
+      },
     },
     {
       id: 'email',
@@ -117,5 +127,5 @@ export function buildCommands(d: Deps): Command[] {
     run: () => window.open(url, '_blank', 'noopener'),
   }));
 
-  return [...sections, ...works, ...decks, ...experience, ...actions, ...elsewhere];
+  return [...sections, ...projects, ...decks, ...internships, ...actions, ...elsewhere];
 }

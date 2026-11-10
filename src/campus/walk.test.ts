@@ -32,7 +32,13 @@ describe('the path graph', () => {
     }
     const seen = new Set(['lib']);
     const queue = ['lib'] as (keyof typeof NODES)[];
-    while (queue.length) for (const n of NEIGHBOURS[queue.shift()!]) if (!seen.has(n)) seen.add(n), queue.push(n);
+    for (let at = queue.shift(); at; at = queue.shift()) {
+      for (const n of NEIGHBOURS[at]) {
+        if (seen.has(n)) continue;
+        seen.add(n);
+        queue.push(n);
+      }
+    }
     expect(seen.size).toBe(Object.keys(NODES).length);
   });
 });

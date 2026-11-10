@@ -124,10 +124,11 @@ export function highlight(text: string, indices: readonly number[]): { text: str
   const hits = new Set(indices);
   const out: { text: string; hit: boolean }[] = [];
   for (let j = 0; j < text.length; j++) {
+    const ch = text.charAt(j);
     const hit = hits.has(j);
-    const tail = out[out.length - 1];
-    if (tail && tail.hit === hit) tail.text += text[j];
-    else out.push({ text: text[j]!, hit });
+    const tail = out.at(-1);
+    if (tail?.hit === hit) tail.text += ch;
+    else out.push({ text: ch, hit });
   }
   return out;
 }

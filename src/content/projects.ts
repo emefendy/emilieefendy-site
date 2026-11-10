@@ -1,171 +1,18 @@
-export const EMAIL = 'eefendy@college.harvard.edu';
+import { deck } from './deck';
+import type { Project } from './types';
 
-export type Link = { label: string; href: string };
-
-export const SOCIALS = {
-  github: 'https://github.com/emefendy',
-  linkedin: 'https://www.linkedin.com/in/emilie-efendy-587153243/',
-} as const;
-
-export type SceneId = 'education' | 'experience' | 'projects' | 'extras';
-
-/** The four buildings you can walk into, in the order the tags are numbered. */
-export const SCENES: readonly { id: SceneId; label: string; title: string }[] = [
-  { id: 'education', label: 'Education', title: 'Education' },
-  { id: 'experience', label: 'Internships', title: 'Internships' },
-  { id: 'projects', label: 'Projects', title: 'Projects' },
-  { id: 'extras', label: 'Awards', title: 'Awards' },
+const ALSF_SCREENS = [
+  'Fundraisers near you',
+  'Personal fundraising page',
+  'Quick-start guide',
+  'FAQ',
+  'Lemonade points',
 ];
 
-export type Experience = {
-  org: string;
-  role: string;
-  meta: string;
-  desc: string[];
-  stack: string[];
-  /** things to look at: a note, a screenshot, slide decks */
-  show?: { note: string; peek?: Slide; decks?: { label: string; slides: Slide[] }[] };
-};
-
-export const EXPERIENCE: Experience[] = [
-  {
-    org: 'QuEra Quantum Computing',
-    role: 'Data Engineering Intern',
-    meta: 'Cambridge, MA · Jun 2026 – Aug 2026',
-    desc: [
-      'Built an end-to-end Python pipeline that pulls messy testbed data into a Postgres backend you can query with SQL, deployed a dashboard for it on a Linux VM, and presented the work to executives.',
-      'Trained three agents (data, analysis and FDTD simulation optimization) with custom evals to improve their harness.',
-      'I also worked on the Anthropic × QuEra pilot of a then-unreleased package for research agents.',
-    ],
-    stack: ['Python', 'Postgres', 'SQL', 'Agents', 'Evals'],
-    show: {
-      note: 'I can’t share the actual code from the repo, but I can share my final presentation slides and a sneak peek of what I built from scratch! I also held an informal AI workshop for some of the more senior researchers who were curious about what’s big in AI right now.',
-      peek: {
-        full: 'previews/quera-platform.jpg',
-        thumb: 'previews/quera-platform-t.jpg',
-        caption: 'Photonics Data Manager · the data tab',
-        label: 'Sneak peek of the Photonics Data Manager I built',
-      },
-      decks: [
-        {
-          label: 'Final presentation · 35 slides',
-          slides: deck('quera', 35, (i) => `QuEra Integrated Photonics Platform · ${i} of 35`, (i) => `QuEra final presentation slide ${i} of 35`),
-        },
-        {
-          label: 'AI workshop · 25 slides',
-          slides: deck('ai-workshop', 25, (i) => `The Big Things in AI Right Now · ${i} of 25`, (i) => `AI workshop slide ${i} of 25`),
-        },
-      ],
-    },
-  },
-  {
-    org: 'Mercor',
-    role: 'Project Manager',
-    meta: 'San Francisco, CA · May 2026 – Jun 2026',
-    desc: [
-      'Helped organize 100+ domain experts and ran internal trainings on eval design and trajectory analysis. Raised the share of submissions passing benchmarks set by frontier AI lab clients from 41% to 85%.',
-      'Off the clock, I joined the data team to help build and debug a simulated enterprise environment, a full company’s workflow recreated so AI agents have a realistic world to operate in.',
-    ],
-    stack: ['Evals', 'Operations', 'JavaScript', 'Supabase', 'Cloudflare Pages'],
-  },
-  {
-    org: 'NC State Department of Computer Science',
-    role: 'Software Engineering Intern',
-    meta: 'Raleigh, NC · Jun 2023 – Aug 2023',
-    desc: [
-      'On an NSF-funded project under Dr. Veronica Catete, programmed Python applications used in under-resourced K-12 classrooms to bring computational thinking into non-STEM courses.',
-      'Led user testing with educators and students, then refined each app around their feedback.',
-    ],
-    stack: ['Python', 'Education', 'User research'],
-  },
-  {
-    org: 'Rice University Quantum Initiative',
-    role: 'Quantum Applications Student Researcher',
-    meta: 'Houston, TX · Jan 2023 – Aug 2025 · with Dr. Tirthak Patel',
-    desc: [
-      'Proposed and led a lab team researching applications of Grover’s algorithm in k-SAT problems, and worked on QCAiEd, a multidisciplinary project with Rice’s Education Department under a Rice Undergraduate Scholars Program grant.',
-    ],
-    stack: ['Quantum computing', 'Qiskit', 'Grover’s algorithm'],
-  },
-];
-
-export const HARVARD_COURSES = [
-  'Theoretical Physics (Teaching Assistant)',
-  'Systems Programming & Machine Organization',
-  'Reinforcement Learning',
-  'Machine Learning (MIT)',
-  'Data Structures & Algorithms',
-  'Algorithms & Limitations',
-  'AI Agents & Multi-Agent Systems',
-  'Quantum Mechanics',
-  'Proof-based Linear Algebra & Vector Calculus',
-  'Probability',
-  'Statistical Inference',
-  'Game Theory for Social Behavior',
-  'Evolving Morality: From Primordial Soup to Superintelligent Machines',
-];
-
-export const ORGS: { name: string; role?: string }[] = [
-  { name: 'Harvard Tech for Social Good', role: 'Executive Board & Senior Software Engineer' },
-  { name: 'HackHarvard', role: 'Finance & Corporate Relations' },
-  { name: 'Harvard Women in Computer Science' },
-  { name: 'Society of Physics Students' },
-  { name: 'Harvard Innovation Labs' },
-  { name: 'Harvard Women in Entrepreneurship' },
-];
-
-export const HS_COURSES = [
-  'Modern Physics',
-  'Multivariable Calculus',
-  'Organic Chemistry',
-  'AP Computer Science A',
-  'AP Physics 1, 2 & C',
-  'AP Statistics',
-  'AP Calculus BC',
-];
-
-/* ---------- works ---------- */
-
-export type Slide = { full: string; thumb: string; caption: string; label: string };
-
-export type Media =
-  | { kind: 'deck'; layout: 'wide' | 'portrait'; label: string; slides: Slide[] }
-  | { kind: 'preview'; href: string; host: string; src: string; alt: string; width: number; height: number };
-
-export type Block = { kind: 'p'; text: string } | { kind: 'list'; items: string[] };
-
-export type Work = {
-  slug: string;
-  title: string;
-  /** a few words for the index row */
-  tags: string;
-  /** what floats next to the cursor in the index; logos get a white card */
-  cover: { src: string; kind: 'logo' | 'shot' };
-  nonprofit?: boolean;
-  logo?: { src: string; alt: string };
-  when?: string;
-  body: Block[];
-  media?: Media;
-  links: Link[];
-  /** extra words the command palette should match on */
-  keywords?: string;
-};
-
-function deck(dir: string, n: number, caption: (i: number) => string, label: (i: number) => string): Slide[] {
-  return Array.from({ length: n }, (_, k) => {
-    const i = k + 1;
-    const nn = String(i).padStart(2, '0');
-    return { full: `decks/${dir}/${nn}.jpg`, thumb: `decks/${dir}/t${nn}.jpg`, caption: caption(i), label: label(i) };
-  });
-}
-
-const ALSF_SCREENS = ['Fundraisers near you', 'Personal fundraising page', 'Quick-start guide', 'FAQ', 'Lemonade points'];
-
-export const WORKS: Work[] = [
+export const PROJECTS: readonly Project[] = [
   {
     slug: 'chw-central',
     tags: 'Senior SWE · RAG · WordPress',
-    cover: { src: 'logos/chw-central.png', kind: 'logo' },
     title: 'Central Healthcare Workers',
     nonprofit: true,
     logo: { src: 'logos/chw-central.png', alt: 'CHW Central logo' },
@@ -195,7 +42,6 @@ export const WORKS: Work[] = [
   {
     slug: 'computers-4-people',
     tags: 'SWE · Electron · Next.js · Computer use',
-    cover: { src: 'logos/computers-4-people.png', kind: 'logo' },
     title: 'Computers 4 People',
     nonprofit: true,
     logo: { src: 'logos/computers-4-people.png', alt: 'Computers 4 People logo' },
@@ -223,7 +69,6 @@ export const WORKS: Work[] = [
   {
     slug: '412-food-rescue',
     tags: 'SWE · i18n · 3 languages',
-    cover: { src: 'logos/412-food-rescue.png', kind: 'logo' },
     title: '412 Food Rescue',
     nonprofit: true,
     logo: { src: 'logos/412-food-rescue.png', alt: '412 Food Rescue logo' },
@@ -249,7 +94,6 @@ export const WORKS: Work[] = [
   {
     slug: 'steel-city-codes',
     tags: 'Executive Director of Events · Hackathons',
-    cover: { src: 'previews/scc.jpg', kind: 'shot' },
     title: 'Steel City Codes',
     nonprofit: true,
     logo: { src: 'logos/steel-city-codes.png', alt: 'Steel City Codes logo' },
@@ -282,7 +126,6 @@ export const WORKS: Work[] = [
   {
     slug: 'alsf',
     tags: 'Project Lead · UX · Figma',
-    cover: { src: 'decks/alsf/01.jpg', kind: 'shot' },
     title: 'Alex’s Lemonade Stand Foundation',
     nonprofit: true,
     logo: { src: 'logos/alsf.png', alt: 'Alex’s Lemonade Stand Foundation logo' },
@@ -325,7 +168,6 @@ export const WORKS: Work[] = [
   {
     slug: 'first-racquet',
     tags: 'Project Lead · UX · iOS',
-    cover: { src: 'decks/first-racquet/02.jpg', kind: 'shot' },
     title: 'First Racquet',
     nonprofit: true,
     keywords: 'tennis ios app ux design angola',
@@ -361,7 +203,6 @@ export const WORKS: Work[] = [
   {
     slug: 'breakthrough',
     tags: 'Researcher · Physics · Global finalist',
-    cover: { src: 'previews/bjc.jpg', kind: 'shot' },
     title: 'Breakthrough Junior Challenge',
     when: 'Global Physics Finalist, 1 of 5 ($400K grand prize)',
     keywords: 'physics higgs video science communication finalist',
@@ -389,7 +230,6 @@ export const WORKS: Work[] = [
   {
     slug: 'evergreen',
     tags: 'iOS Developer · SwiftUI · Pitch',
-    cover: { src: 'decks/evergreen/01.jpg', kind: 'shot' },
     title: 'For Evergreen',
     when: 'Pitched @ Technovation Houston · 2024',
     keywords: 'swiftui ios climate carbon gpt pitch',
@@ -415,7 +255,6 @@ export const WORKS: Work[] = [
   {
     slug: 'wecode',
     tags: 'Executive Director of Programming · Conference',
-    cover: { src: 'previews/wecode.jpg', kind: 'shot' },
     title: 'Harvard WECode x Build@HUB Vietnam',
     when: 'Director of Programming · Harvard WECode',
     keywords: 'conference women in tech panel vietnam',
@@ -445,93 +284,5 @@ export const WORKS: Work[] = [
       height: 440,
     },
     links: [{ label: 'Harvard WECode', href: 'https://www.wecodeconference.com/' }],
-  },
-];
-
-export const RECOGNITION: { title: string; sub: string }[] = [
-  { title: 'Global Physics Finalist, 1 of 5 ($400K grand prize)', sub: 'Breakthrough Junior Challenge' },
-  {
-    title: 'Science Olympiad: Regional, State and National Invitational Medalist',
-    sub: 'Main Events: Astronomy, Experimental Design, Optics, Wind Power, WIDI/WICI',
-  },
-  { title: '1st Chair Cellist', sub: '80th International Midwest Convention · Chicago' },
-  { title: 'All-State Symphony Cellist', sub: 'Texas Music Educators Association' },
-  { title: '1st Place, Advanced Division', sub: 'Texas Digital Divas Programming Competition' },
-  { title: 'Affiliate Winner', sub: 'National Center for Women & Information Technology Aspirations in Computing' },
-  { title: 'National Merit Scholar', sub: 'NMSC' },
-  { title: 'Most Likely to Beat Mr. Shah in a Physics Pun Battle', sub: 'Clements Junior Engineering Technical Society' },
-];
-
-export const PROGRAMS = [
-  'MIT Quantum Winter School',
-  'Point72 Spring Academy',
-  'D.E. Shaw Connect',
-  'Inside DRW',
-  'Two Sigma New Seekers Summit',
-];
-
-/* ---------- talking to me ---------- */
-
-/** The dialog boxes on a first visit, one per Next. */
-export const INTRO: readonly string[] = [
-  'Hi there! I’m Emilie, a Harvard student studying computer science and physics, with a concurrent master’s in CS.',
-  'A little bit about me: I’m super passionate about building projects that get used by real people, and I’ve had the chance to do that by partnering with both local and global nonprofits. I also love teaching! I lead weekly two-hour lectures for Harvard Tech for Social Good on topics like Git and React, and I host office hours as a course assistant for Theoretical Physics.',
-  'I hope you enjoy exploring my site! I’ll be around if you have any questions.',
-];
-
-export type Faq = {
-  q: string;
-  a: string;
-  /** a building the answer points to */
-  go?: SceneId;
-  links?: Link[];
-  /** special answers the landing page handles itself */
-  special?: 'replay';
-};
-
-export const FAQ: readonly Faq[] = [
-  {
-    q: 'What do you study?',
-    a: 'Computer science and physics at Harvard, with a concurrent master’s in CS. Some of my favorite classes: Theoretical Physics (I hold office hours and help with grading), Machine Learning, Systems Programming, and Evolving Morality: From Primordial Soup to Superintelligent Machines!',
-    go: 'education',
-  },
-  {
-    q: 'What have you built/worked on?',
-    a: [
-      '0 → 1 projects, used by thousands of users worldwide:',
-      '• CHW Central: AI search + chatbot for 60,000+ health workers',
-      '• Computers 4 People: an AI helper for first-time computer users',
-      '• 412 Food Rescue: its app in Spanish and French for volunteers',
-      '• Steel City Codes: led 16 chapters, 400+ students',
-    ].join('\n'),
-    go: 'projects',
-  },
-  {
-    q: 'Where have you worked?',
-    a: 'Most recently QuEra Quantum Computing, building a data pipeline and training agents against custom evals. Before that Mercor, NC State and Rice’s quantum initiative.',
-    go: 'experience',
-  },
-  {
-    q: 'What organizations are you involved with?',
-    a: [
-      'At Harvard:',
-      '• Harvard Tech for Social Good: I lead two cohorts and teach weekly lectures',
-      '• HackHarvard: finance & corporate relations',
-      '• Society of Physics Students, Innovation Labs, and Women in Entrepreneurship',
-    ].join('\n'),
-    go: 'education',
-  },
-  {
-    q: 'What do you do for fun?',
-    a: 'I love to run, and I’m currently training for a half marathon! I also love experimenting in the dining hall to see what new recipes I can come up with. I’ve also won some state and national competitions for cello.',
-    go: 'extras',
-  },
-  {
-    q: 'How can I reach you?',
-    a: 'You can reach me through email: eefendy@college.harvard.edu. LinkedIn works too!',
-    links: [
-      { label: 'Email', href: 'mailto:eefendy@college.harvard.edu' },
-      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/emilie-efendy-587153243/' },
-    ],
   },
 ];
