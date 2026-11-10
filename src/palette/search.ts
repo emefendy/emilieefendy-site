@@ -1,7 +1,11 @@
 import { fuzzyMatch } from '../lib/fuzzy';
 import { GROUPS, type Command, type Result } from './types';
 
-const words = (s: string) => s.toLowerCase().split(/[^a-z0-9+#]+/).filter(Boolean);
+const words = (s: string) =>
+  s
+    .toLowerCase()
+    .split(/[^a-z0-9+#]+/)
+    .filter(Boolean);
 
 /**
  * Titles get the fuzzy matcher. Everything else (hints, keywords, the body

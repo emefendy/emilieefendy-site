@@ -1,32 +1,26 @@
-import { useEffect, useRef } from 'react';
+import { useWindowEvent } from './useWindowEvent';
 
 type Combo = 'mod+k' | '/';
 
-const typingIn = (el: EventTarget | null) =>
+const isTyping = (el: EventTarget | null) =>
   el instanceof HTMLElement && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
 
-/**
- * Tiny global shortcut handler. "mod" is ⌘ on a Mac and Ctrl everywhere else.
- * Plain keys like "/" are ignored while you're typing in a field.
- */
-export function useHotkeys(map: Partial<Record<Combo, () => void>>) {
-  // read the latest handlers without re-binding the listener every render
-  const ref = useRef(map);
-  ref.current = map;
+function comboOf(e: KeyboardEvent): Combo | null {
+  const mod = e.metaKey || e.ctrlKey;
+  if (e.altKey) return null;
+  if (mod && !e.shiftKey && e.key.toLowerCase() === 'k') return 'mod+k';
+  if (!mod && e.key === '/' && !isTyping(e.target)) return '/';
+  return null;
+}
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.defaultPrevented || e.isComposing) return;
-      const mod = e.metaKey || e.ctrlKey;
-      let combo: Combo | null = null;
-      if (mod && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'k') combo = 'mod+k';
-      else if (!mod && !e.altKey && e.key === '/' && !typingIn(e.target)) combo = '/';
-      const fn = combo && ref.current[combo];
-      if (!fn) return;
-      e.preventDefault();
-      fn();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
+/** "mod" is ⌘ on a Mac and Ctrl elsewhere. */
+export function useHotkeys(bindings: Partial<Record<Combo, () => void>>) {
+  useWindowEvent('keydown', (e) => {
+    if (e.defaultPrevented || e.isComposing) return;
+    const combo = comboOf(e);
+    const run = combo && bindings[combo];
+    if (!run) return;
+    e.preventDefault();
+    run();
+  });
 }

@@ -7,6 +7,9 @@
 
 import type { SceneId } from '../content';
 
+export const ART_W = 1415;
+export const ART_H = 1111;
+
 export type Pt = readonly [number, number];
 
 /** Walkable path junctions, traced off the stone paving. */
@@ -62,8 +65,8 @@ export const LAMPS: readonly Pt[] = [
   [777, 290],
 ];
 
-/** Tree canopies that drop leaves: x0, y0, x1, y1. */
-export const CANOPIES: readonly (readonly [number, number, number, number])[] = [
+/** Tree canopies that drop leaves. */
+export const CANOPIES: readonly Box[] = [
   [80, 300, 230, 480],
   [560, 560, 680, 650],
   [800, 590, 900, 690],
@@ -85,16 +88,17 @@ export const LAWNS: readonly Pt[] = [
   [640, 870],
 ];
 
+/** x0, y0, x1, y1 */
 export type Box = readonly [number, number, number, number];
-export type Building = { scene: SceneId; label: string; tag: Pt; box: Box };
+export type Building = { scene: SceneId; tag: Pt; box: Box };
 
 /**
  * The four buildings you can walk into: where each tag sits, and the box the
- * camera frames when you zoom in (x0, y0, x1, y1).
+ * camera frames when you zoom in.
  */
 export const BUILDINGS: readonly Building[] = [
-  { scene: 'education', label: 'Education', tag: [400, 250], box: [190, 165, 615, 525] },
-  { scene: 'experience', label: 'Internships', tag: [1130, 250], box: [845, 175, 1250, 525] },
-  { scene: 'projects', label: 'Projects', tag: [300, 520], box: [105, 455, 560, 825] },
-  { scene: 'extras', label: 'Awards', tag: [1110, 560], box: [880, 475, 1320, 835] },
+  { scene: 'education', tag: [400, 250], box: [190, 165, 615, 525] },
+  { scene: 'internships', tag: [1130, 250], box: [845, 175, 1250, 525] },
+  { scene: 'projects', tag: [300, 520], box: [105, 455, 560, 825] },
+  { scene: 'awards', tag: [1110, 560], box: [880, 475, 1320, 835] },
 ];

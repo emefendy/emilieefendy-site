@@ -1,119 +1,87 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { SCENES, type SceneId, type Slide } from './content';
-import { useTheme } from './hooks/useTheme';
+import { CaseStudy } from './components/CaseStudy';
+import { Hero } from './components/Hero';
+import { Lightbox, type LightboxState } from './components/Lightbox';
+import { Scene } from './components/Scene';
+import { internshipId } from './components/sections/Internships';
+import { Toast } from './components/Toast';
+import type { Slide } from './content';
 import { useHotkeys } from './hooks/useHotkeys';
+import { useSceneRoute } from './hooks/useSceneRoute';
+import { useTheme } from './hooks/useTheme';
+import { useWindowEvent } from './hooks/useWindowEvent';
 import { reducedMotion } from './lib/motion';
-import { slugify } from './lib/slug';
+import { read, write } from './lib/storage';
+import { IntroDialog } from './me/IntroDialog';
 import { buildCommands } from './palette/commands';
 import { CommandPalette } from './palette/CommandPalette';
-import { Hero } from './components/Hero';
-import { Scene } from './components/Scene';
-import { CaseStudy } from './components/CaseStudy';
-import { Lightbox, type LightboxState } from './components/Lightbox';
-import { Toast } from './components/Toast';
-import { IntroDialog } from './me/IntroDialog';
 
-const MET = 'met';
-const hasMet = () => {
-  try {
-    return localStorage.getItem(MET) === '1';
-  } catch {
-    return false;
-  }
-};
-
-/** #projects → 'projects' */
-function sceneFromHash(): SceneId | null {
-  const h = location.hash.slice(1);
-  return SCENES.some((s) => s.id === h) ? (h as SceneId) : null;
-}
+const MET_KEY = 'met';
+/** long enough for the zoom to land before scrolling inside the panel */
+const SCROLL_AFTER_ZOOM_MS = 700;
 
 export function App() {
-  const { resolved: theme, toggle: toggleTheme } = useTheme();
+  const { theme, toggle: toggleTheme } = useTheme();
+  const { scene, openScene, goHome } = useSceneRoute();
   const [reduced] = useState(reducedMotion);
-  const [scene, setScene] = useState<SceneId | null>(sceneFromHash);
-  const [work, setWork] = useState<string | null>(null);
-  const [openXp, setOpenXp] = useState<ReadonlySet<string>>(() => new Set());
+  const [project, setProject] = useState<string | null>(null);
+  const [openInternships, setOpenInternships] = useState<ReadonlySet<string>>(() => new Set());
   const [slides, setSlides] = useState<LightboxState>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
-  const [toast, setToast] = useState<{ msg: string; id: number } | null>(null);
-  // say hello on a first visit (straight into a building's link skips it)
-  const [intro, setIntro] = useState(() => !hasMet() && !sceneFromHash());
+  const [toast, setToast] = useState<{ message: string; id: number } | null>(null);
+  // first visit only, and not for someone arriving on a deep link
+  const [intro, setIntro] = useState(() => read(MET_KEY) !== '1' && !scene);
+
   const finishIntro = useCallback(() => {
     setIntro(false);
-    try {
-      localStorage.setItem(MET, '1');
-    } catch {
-      /* fine, they'll get a hello next time too */
-    }
+    write(MET_KEY, '1');
   }, []);
 
-  // Opening a building from the campus adds a history entry, so the browser's
-  // back button walks you out again; hopping between buildings doesn't.
-  const openScene = useCallback((id: SceneId) => {
-    setScene((cur) => {
-      if (cur) history.replaceState(null, '', '#' + id);
-      else history.pushState(null, '', '#' + id);
-      return id;
-    });
-  }, []);
-  const goHome = useCallback(() => {
-    setScene(null);
-    history.replaceState(null, '', location.pathname + location.search);
-  }, []);
-
-  useEffect(() => {
-    const sync = () => setScene(sceneFromHash());
-    window.addEventListener('popstate', sync);
-    window.addEventListener('hashchange', sync);
-    return () => {
-      window.removeEventListener('popstate', sync);
-      window.removeEventListener('hashchange', sync);
-    };
-  }, []);
-
-  // the campus is the page; while you're inside a building nothing behind it scrolls
+  // the page behind a building doesn't scroll
   useEffect(() => {
     document.documentElement.classList.toggle('in-scene', !!scene);
   }, [scene]);
 
-  const toggleXp = useCallback((org: string, open: boolean) => {
-    setOpenXp((s) => {
-      const next = new Set(s);
+  const toggleInternship = useCallback((org: string, open: boolean) => {
+    setOpenInternships((current) => {
+      const next = new Set(current);
       if (open) next.add(org);
       else next.delete(org);
       return next;
     });
   }, []);
 
-  const openExperience = useCallback(
+  const showInternship = useCallback(
     (org: string) => {
-      openScene('experience');
-      setOpenXp((s) => new Set(s).add(org));
-      setTimeout(() => document.getElementById('xp-' + slugify(org))?.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' }), 700);
+      openScene('internships');
+      setOpenInternships((current) => new Set(current).add(org));
+      setTimeout(() => {
+        document
+          .getElementById(internshipId(org))
+          ?.scrollIntoView({ block: 'start', behavior: reduced ? 'auto' : 'smooth' });
+      }, SCROLL_AFTER_ZOOM_MS);
     },
     [openScene, reduced],
   );
 
   const openSlides = useCallback((list: Slide[], index: number) => setSlides({ slides: list, index }), []);
-  const showToast = useCallback((msg: string) => setToast({ msg, id: Date.now() }), []);
+  const showToast = useCallback((message: string) => setToast({ message, id: Date.now() }), []);
+  const hideToast = useCallback(() => setToast(null), []);
 
-  const modalOpen = !!slides || !!work || intro;
+  const modalOpen = !!slides || !!project || intro;
   useHotkeys({
-    'mod+k': () => !modalOpen && setPaletteOpen((o) => !o),
+    'mod+k': () => !modalOpen && setPaletteOpen((open) => !open),
     '/': () => !modalOpen && setPaletteOpen(true),
   });
 
-  // Escape walks back out of a building (the case study and slide viewer handle their own)
-  useEffect(() => {
-    if (!scene) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape' || e.defaultPrevented || modalOpen || paletteOpen) return;
-      goHome();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [scene, modalOpen, paletteOpen, goHome]);
+  // Escape walks out of a building; dialogs on top handle their own Escape first
+  useWindowEvent(
+    'keydown',
+    (e) => {
+      if (e.key === 'Escape' && !e.defaultPrevented && !modalOpen && !paletteOpen) goHome();
+    },
+    !!scene,
+  );
 
   const commands = useMemo(
     () =>
@@ -122,32 +90,32 @@ export function App() {
         toggleTheme,
         openScene,
         goHome,
-        openWork: setWork,
-        openExperience,
+        openProject: setProject,
+        showInternship,
         openSlides,
         toast: showToast,
         replayIntro: () => setIntro(true),
       }),
-    [theme, toggleTheme, openScene, goHome, openExperience, openSlides, showToast],
+    [theme, toggleTheme, openScene, goHome, showInternship, openSlides, showToast],
   );
 
   return (
     <>
-      <Hero focus={scene} onOpen={openScene} onReplay={() => setIntro(true)} reduced={reduced} />
+      <Hero focus={scene} onOpen={openScene} reduced={reduced} />
       <Scene
         scene={scene}
         onClose={goHome}
         onSwitch={openScene}
-        openXp={openXp}
-        onToggleXp={toggleXp}
-        onOpenWork={setWork}
+        openInternships={openInternships}
+        onToggleInternship={toggleInternship}
+        onOpenProject={setProject}
         onOpenSlides={openSlides}
       />
-      <CaseStudy slug={work} onClose={() => setWork(null)} onNavigate={setWork} onOpenSlides={openSlides} />
+      <CaseStudy slug={project} onClose={() => setProject(null)} onNavigate={setProject} onOpenSlides={openSlides} />
       <Lightbox state={slides} onChange={setSlides} />
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} />
       <IntroDialog open={intro} onDone={finishIntro} />
-      {toast && <Toast key={toast.id} message={toast.msg} onDone={() => setToast(null)} />}
+      {toast && <Toast key={toast.id} message={toast.message} onDone={hideToast} />}
     </>
   );
 }

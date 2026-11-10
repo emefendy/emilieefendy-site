@@ -23,23 +23,3 @@ export const LinkedinIcon = (p: P) => (
     <circle cx="4" cy="4" r="2" />
   </svg>
 );
-
-export const SunIcon = (p: P) => (
-  <svg {...base} {...p}>
-    <circle cx="12" cy="12" r="4" />
-    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-  </svg>
-);
-
-export const MoonIcon = (p: P) => (
-  <svg {...base} {...p}>
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-  </svg>
-);
-
-export const SearchIcon = (p: P) => (
-  <svg {...base} {...p}>
-    <circle cx="11" cy="11" r="7" />
-    <path d="m20 20-3.5-3.5" />
-  </svg>
-);
