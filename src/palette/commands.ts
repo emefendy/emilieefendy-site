@@ -67,7 +67,7 @@ export function buildCommands(d: Deps): Command[] {
     title: x.org,
     hint: x.role,
     keywords: [x.meta, x.stack.join(' '), x.desc.join(' ')].join(' '),
-    group: 'Experience',
+    group: 'Internships',
     run: () => d.openExperience(x.org),
   }));
 

@@ -12,7 +12,7 @@ export type SceneId = 'education' | 'experience' | 'projects' | 'extras';
 /** The four buildings you can walk into, in the order the tags are numbered. */
 export const SCENES: readonly { id: SceneId; label: string; title: string }[] = [
   { id: 'education', label: 'Education', title: 'Education' },
-  { id: 'experience', label: 'Experience', title: 'Experience' },
+  { id: 'experience', label: 'Internships', title: 'Internships' },
   { id: 'projects', label: 'Projects', title: 'Projects' },
   { id: 'extras', label: 'Awards', title: 'Awards' },
 ];
