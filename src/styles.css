@@ -622,3 +622,12 @@ html.in-scene, html.in-scene body { overflow: hidden; }
 .cs-prev:hover .cs-next-t { transform: translateX(-12px); }
 .cs-prev:hover > span:first-child { transform: translateX(-8px); }
 @media (max-width: 760px) { .cs-pn { grid-template-columns: 1fr; } .cs-prev { border-right: 0 !important; border-bottom: 1px solid var(--line) !important; } }
+
+/* experience: a little more air between companies and inside each one */
+.scene .link-list { gap: 22px; }
+.scene .link-list .w-body { padding: 14px 0 18px; }
+.scene .link-list .x-role { margin-bottom: 4px; }
+.scene .link-list .w-meta { margin-bottom: 14px; }
+.scene .link-list .w-desc + .w-desc { margin-top: 14px; }
+.scene .link-list .stack { margin-top: 16px; }
+.scene .link-list .xp-show { margin-top: 24px; padding-top: 20px; }
