@@ -2,7 +2,7 @@ import { EMAIL, SOCIALS, type SceneId } from '../content';
 import { cx } from '../lib/cx';
 import { CampusScene } from '../campus/CampusScene';
 import { AskMe } from '../me/AskMe';
-import { GithubIcon, LinkedinIcon, MailIcon } from './Icons';
+import { LinkedinIcon, MailIcon } from './Icons';
 
 type Props = { focus: SceneId | null; onOpen: (scene: SceneId) => void; reduced: boolean };
 
@@ -20,12 +20,6 @@ export function Hero({ focus, onOpen, reduced }: Props) {
           <a href={'mailto:' + EMAIL}>
             <MailIcon />
             {EMAIL}
-          </a>
-        </li>
-        <li>
-          <a href={SOCIALS.github} target="_blank" rel="noopener">
-            <GithubIcon />
-            github
           </a>
         </li>
         <li>
